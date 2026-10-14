@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Festive Calendar – Monastery360</title>
+  <meta name="description" content="Explore Sikkim's Buddhist festival calendar. Discover Losar, Bumchu, Saga Dawa and other sacred events at monasteries across Sikkim." />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#FF9933" />
+  <link rel="apple-touch-icon" href="images/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/globals.css" />
+  <link rel="stylesheet" href="css/calendar.css" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <script src="js/auth.js"></script>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar scrolled" id="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">☸️</div>
+      Monastery<span style="color:var(--saffron)">360</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="calendar.html" class="active">📅 Festive Calendar</a></li>
+      <li><a href="tours.html">🎥 360° Tours</a></li>
+      <li><a href="gallery.html">🖼️ Culture Gallery</a></li>
+      <li><a href="stay.html">🏨 Stay & Booking</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-search-btn" id="searchBtn" title="Search">🔍</button>
+      <button class="nav-hamburger" id="navHamburger">☰</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Page Header ── -->
+<div class="page-header">
+  <div class="header-glow"></div>
+  <div class="container">
+    <h1>🎉 Festive Calendar</h1>
+    <p>Discover sacred festivals across Sikkim's monasteries — click any date to explore events</p>
+  </div>
+</div>
+
+<!-- ── Calendar Section ── -->
+<section class="section calendar-section">
+  <div class="container">
+    <div style="display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:start" id="calLayout">
+
+      <!-- Left: Calendar -->
+      <div>
+        <!-- Month Nav -->
+        <div class="cal-nav">
+          <button class="cal-nav-btn" id="prevMonth" title="Previous month">◀</button>
+          <div>
+            <span class="cal-month-label" id="calMonthLabel">January</span>
+            <span class="cal-year" id="calYearLabel">2026</span>
+          </div>
+          <button class="cal-nav-btn" id="nextMonth" title="Next month">▶</button>
+        </div>
+
+        <!-- Filters -->
+        <div class="cal-filters">
+          <span style="font-weight:600;color:var(--text-secondary);font-size:0.9rem">Filter:</span>
+          <select class="cal-filter-select" id="locationFilter">
+            <option value="">All Districts</option>
+            <option value="East Sikkim">East Sikkim</option>
+            <option value="West Sikkim">West Sikkim</option>
+            <option value="North Sikkim">North Sikkim</option>
+            <option value="South Sikkim">South Sikkim</option>
+          </select>
+          <select class="cal-filter-select" id="typeFilter">
+            <option value="">All Events</option>
+            <option value="losar">Losar</option>
+            <option value="bumchu">Bumchu</option>
+            <option value="saga">Saga Dawa</option>
+            <option value="pang">Pang Lhabsol</option>
+          </select>
+          <button class="filter-btn active" id="clearFilters">Reset</button>
+        </div>
+
+        <!-- Calendar Grid -->
+        <div class="calendar-wrap">
+          <div class="cal-weekdays">
+            <div class="cal-weekday">Sun</div>
+            <div class="cal-weekday">Mon</div>
+            <div class="cal-weekday">Tue</div>
+            <div class="cal-weekday">Wed</div>
+            <div class="cal-weekday">Thu</div>
+            <div class="cal-weekday">Fri</div>
+            <div class="cal-weekday">Sat</div>
+          </div>
+          <div class="cal-days" id="calDays"></div>
+        </div>
+
+        <!-- Color legend -->
+        <div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;padding:12px 16px;background:var(--white);border-radius:var(--radius-md);border:1px solid var(--cream-dark)">
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.82rem">
+            <span style="width:14px;height:14px;border-radius:3px;background:rgba(255,153,51,0.25);display:inline-block"></span> Losar
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.82rem">
+            <span style="width:14px;height:14px;border-radius:3px;background:rgba(42,122,106,0.2);display:inline-block"></span> Bumchu
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.82rem">
+            <span style="width:14px;height:14px;border-radius:3px;background:rgba(212,160,23,0.25);display:inline-block"></span> Saga Dawa
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.82rem">
+            <span style="width:14px;height:14px;border-radius:3px;background:rgba(128,0,32,0.15);display:inline-block"></span> Pang Lhabsol
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.82rem">
+            <span style="width:14px;height:14px;border-radius:3px;background:rgba(139,94,60,0.2);display:inline-block"></span> Other Events
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:0.82rem">
+            <span style="color:var(--saffron);font-size:1rem">●</span> Today
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Upcoming Events -->
+      <div>
+        <div class="upcoming-events" data-reveal>
+          <h3>📌 All Year Festivals</h3>
+          <div id="upcomingList"></div>
+        </div>
+        <div style="margin-top:20px;padding:20px;background:linear-gradient(135deg,rgba(255,153,51,0.1),rgba(212,160,23,0.08));border:2px solid rgba(255,153,51,0.2);border-radius:var(--radius-lg)">
+          <div style="font-size:1.5rem;margin-bottom:8px">💡</div>
+          <h4 style="font-family:var(--font-heading);margin-bottom:6px">Plan Your Visit</h4>
+          <p style="font-size:0.85rem;color:var(--text-secondary);line-height:1.6">Festival dates follow the Tibetan lunar calendar — click an event to explore the monastery and book your stay!</p>
+          <a href="stay.html" class="btn btn-primary" style="margin-top:14px;font-size:0.85rem;padding:10px 20px">🏨 Find Nearby Hotels</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Event Detail Panel ── -->
+<div class="event-panel" id="eventPanel">
+  <div class="event-panel-header">
+    <div class="event-panel-title" id="panelEventName">Event Name</div>
+    <div style="font-size:0.82rem;color:rgba(255,255,255,0.65);margin-top:4px" id="panelEventMonastery"></div>
+    <button class="event-panel-close" id="eventPanelClose">✕</button>
+  </div>
+  <div class="event-panel-body">
+    <div class="event-detail-item">
+      <div class="event-detail-label">📅 Date</div>
+      <div class="event-detail-value" id="panelEventDate"></div>
+    </div>
+    <div class="event-detail-item">
+      <div class="event-detail-label">⏱ Duration</div>
+      <div class="event-detail-value" id="panelEventDuration"></div>
+    </div>
+    <div class="event-detail-item">
+      <div class="event-detail-label">📖 About this Festival</div>
+      <div class="event-detail-value" id="panelEventDesc" style="line-height:1.7;font-size:0.9rem"></div>
+    </div>
+    <hr class="divider" style="margin:20px 0" />
+    <a href="#" class="btn btn-primary" id="panelExploreBtn" style="width:100%;justify-content:center;margin-bottom:10px">🎥 Explore Monastery 360°</a>
+    <a href="stay.html" class="btn btn-secondary" style="width:100%;justify-content:center">🏨 Book Nearby Stay</a>
+  </div>
+</div>
+
+<!-- ── Event Tooltip ── -->
+<div class="event-tooltip" id="eventTooltip">
+  <div class="tooltip-title" id="ttTitle"></div>
+  <div class="tooltip-date" id="ttDate"></div>
+  <div class="tooltip-desc" id="ttDesc"></div>
+</div>
+
+<!-- ── Confetti Container ── -->
+<div class="confetti-container" id="confettiContainer"></div>
+
+<!-- ── Search Modal ── -->
+<div class="modal-overlay" id="searchModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 style="font-family:var(--font-heading)">Search Monastery360</h3>
+      <button class="modal-close" id="searchClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search monasteries, events, hotels…" />
+      </div>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer style="background:var(--deep);color:rgba(255,255,255,0.6);padding:32px 0;text-align:center;font-size:0.85rem">
+  <div class="container">
+    <a href="index.html" style="color:var(--saffron);font-family:var(--font-heading);font-size:1.1rem;font-weight:700">☸️ Monastery360</a>
+    <p style="margin-top:8px">© 2026 Monastery360 · Sacred Sikkim Heritage</p>
+  </div>
+</footer>
+
+<script src="js/pano_b64.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+// ── Calendar Page Logic ──────────────────────────────────────
+(function() {
+
+const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const today = new Date();
+let currentMonth = today.getMonth() + 1; // 1-indexed
+let currentYear = 2026;
+let activeFilterType = '';
+let activeFilterLoc  = '';
+let selectedEvent = null;
+
+// Build monastery location lookup
+const monMap = {};
+(window.M360Data?.monasteries || []).forEach(m => monMap[m.id] = m);
+
+// ── Render Calendar ─────────────────────────────────────────
+function renderCalendar() {
+  const label  = document.getElementById('calMonthLabel');
+  const yLabel = document.getElementById('calYearLabel');
+  if (label) label.textContent = MONTHS[currentMonth - 1];
+  if (yLabel) yLabel.textContent = currentYear;
+
+  const firstDay = new Date(currentYear, currentMonth - 1, 1).getDay();
+  const daysInMonth = new Date(currentYear, currentMonth, 0).getDate();
+  const daysInPrev  = new Date(currentYear, currentMonth - 1, 0).getDate();
+
+  // Get events for current month (filtered)
+  const monthEvents = (window.M360Data?.events || []).filter(ev => {
+    const monthMatch = ev.month === currentMonth;
+    const typeMatch  = !activeFilterType || ev.type === activeFilterType;
+    const locMatch   = !activeFilterLoc || (monMap[ev.monastery]?.location || '').includes(activeFilterLoc);
+    return monthMatch && typeMatch && locMatch;
+  });
+
+  const eventsByDay = {};
+  monthEvents.forEach(ev => {
+    if (!eventsByDay[ev.day]) eventsByDay[ev.day] = [];
+    eventsByDay[ev.day].push(ev);
+  });
+
+  const container = document.getElementById('calDays');
+  if (!container) return;
+  let html = '';
+
+  // Prev month trailing cells
+  for (let i = firstDay - 1; i >= 0; i--) {
+    html += `<div class="cal-day other-month"><div class="cal-day-inner"><span class="cal-day-num">${daysInPrev - i}</span></div></div>`;
+  }
+
+  // Current month days
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === today.getDate() && currentMonth === today.getMonth()+1 && currentYear === today.getFullYear();
+    const dayEvents = eventsByDay[d] || [];
+    const hasFestival = dayEvents.some(e => e.isFestival);
+
+    html += `<div class="cal-day${isToday?' today':''}${dayEvents.length?' has-event':''}${hasFestival?' festival-day':''}"
+               data-day="${d}" data-month="${currentMonth}" data-year="${currentYear}">
+      <div class="cal-day-inner">
+        <span class="cal-day-num">${d}</span>
+        <div class="cal-events-list">
+          ${dayEvents.slice(0,2).map(ev =>
+            `<div class="cal-event-pill event-${ev.type}"
+                  data-event-id="${ev.id}"
+                  onmouseenter="showTooltip(event,'${ev.id}')"
+                  onmouseleave="hideTooltip()"
+                  onclick="openEventPanel(event,'${ev.id}')">${ev.emoji} ${ev.name}</div>`
+          ).join('')}
+          ${dayEvents.length > 2 ? `<div class="cal-event-pill event-default">+${dayEvents.length-2} more</div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }
+
+  // Next month padding
+  const totalCells = Math.ceil((firstDay + daysInMonth) / 7) * 7;
+  for (let d = 1; d <= totalCells - firstDay - daysInMonth; d++) {
+    html += `<div class="cal-day other-month"><div class="cal-day-inner"><span class="cal-day-num">${d}</span></div></div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+// ── Tooltip ─────────────────────────────────────────────────
+window.showTooltip = function(e, evId) {
+  const ev = M360Data.events.find(x => x.id === evId);
+  if (!ev) return;
+  const tt = document.getElementById('eventTooltip');
+  document.getElementById('ttTitle').textContent = ev.emoji + ' ' + ev.name;
+  document.getElementById('ttDate').textContent = `📅 ${MONTHS[ev.month-1]} ${ev.day} · ${ev.duration}`;
+  document.getElementById('ttDesc').textContent = ev.description.substring(0, 100) + '…';
+  tt.style.left = (e.clientX + 14) + 'px';
+  tt.style.top  = (e.clientY - 20) + 'px';
+  tt.classList.add('visible');
+};
+
+window.hideTooltip = function() {
+  document.getElementById('eventTooltip').classList.remove('visible');
+};
+
+// ── Confetti ─────────────────────────────────────────────────
+function triggerConfetti() {
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  const colors = ['#FF9933','#FFD700','#FF3B3B','#4CAF50','#2196F3','#9C27B0','#FFFFFF'];
+  const shapes = ['◆','●','▲','★','♦'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.textContent = shapes[Math.floor(Math.random()*shapes.length)];
+    piece.style.cssText = `
+      left:${Math.random()*100}%;
+      top:-20px;
+      color:${colors[Math.floor(Math.random()*colors.length)]};
+      font-size:${10+Math.random()*14}px;
+      animation-delay:${Math.random()*1.5}s;
+      animation-duration:${2.5+Math.random()*1.5}s;
+    `;
+    container.appendChild(piece);
+    setTimeout(() => piece.remove(), 4000);
+  }
+}
+
+// ── Event Panel ──────────────────────────────────────────────
+window.openEventPanel = function(e, evId) {
+  e.stopPropagation();
+  hideTooltip();
+  const ev = M360Data.events.find(x => x.id === evId);
+  if (!ev) return;
+  selectedEvent = ev;
+
+  document.getElementById('panelEventName').textContent = ev.emoji + ' ' + ev.name;
+  document.getElementById('panelEventMonastery').textContent = '📍 ' + ev.monasteryName;
+  document.getElementById('panelEventDate').textContent = `${MONTHS[ev.month-1]} ${ev.day}, 2026`;
+  document.getElementById('panelEventDuration').textContent = ev.duration;
+  document.getElementById('panelEventDesc').textContent = ev.longDesc;
+  document.getElementById('panelExploreBtn').href = `tours.html?id=${ev.monastery}&event=${ev.id}`;
+
+  document.getElementById('eventPanel').classList.add('open');
+  if (ev.isFestival) triggerConfetti();
+};
+
+function closeEventPanel() {
+  document.getElementById('eventPanel').classList.remove('open');
+}
+
+// ── Upcoming Events List ─────────────────────────────────────
+function renderUpcomingList() {
+  const list = document.getElementById('upcomingList');
+  if (!list || !window.M360Data) return;
+  list.innerHTML = M360Data.events.map(ev => `
+    <div class="upcoming-event-item" onclick="openEventPanel(event,'${ev.id}')">
+      <div class="event-date-box">
+        <div class="event-date-day">${ev.day}</div>
+        <div class="event-date-month">${MONTHS[ev.month-1].substr(0,3)}</div>
+      </div>
+      <div class="upcoming-event-info">
+        <h4>${ev.emoji} ${ev.name}</h4>
+        <p>${ev.monasteryName}</p>
+        <div class="badge badge-${ev.type === 'losar' ? 'saffron' : ev.type === 'bumchu' ? 'teal' : ev.type === 'saga' ? 'gold' : 'maroon'}" style="margin-top:4px;font-size:0.72rem">${ev.duration}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Navigation ───────────────────────────────────────────────
+document.getElementById('prevMonth').addEventListener('click', () => {
+  currentMonth--;
+  if (currentMonth < 1) { currentMonth = 12; currentYear--; }
+  renderCalendar();
+});
+document.getElementById('nextMonth').addEventListener('click', () => {
+  currentMonth++;
+  if (currentMonth > 12) { currentMonth = 1; currentYear++; }
+  renderCalendar();
+});
+
+// Filters
+document.getElementById('locationFilter').addEventListener('change', function() {
+  activeFilterLoc = this.value; renderCalendar();
+});
+document.getElementById('typeFilter').addEventListener('change', function() {
+  activeFilterType = this.value; renderCalendar();
+});
+document.getElementById('clearFilters').addEventListener('click', () => {
+  activeFilterLoc = ''; activeFilterType = '';
+  document.getElementById('locationFilter').value = '';
+  document.getElementById('typeFilter').value = '';
+  renderCalendar();
+});
+
+document.getElementById('eventPanelClose').addEventListener('click', closeEventPanel);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEventPanel(); });
+
+// ── Responsive Cal Layout ─────────────────────────────────── 
+function handleResize() {
+  const layout = document.getElementById('calLayout');
+  if (!layout) return;
+  if (window.innerWidth < 900) {
+    layout.style.gridTemplateColumns = '1fr';
+  } else {
+    layout.style.gridTemplateColumns = '1fr 320px';
+  }
+}
+window.addEventListener('resize', handleResize);
+handleResize();
+
+// ── Init ─────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderCalendar();
+  renderUpcomingList();
+});
+
+})();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+    });
+  }
+</script>
+</body>
+</html>

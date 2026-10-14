@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>360° Virtual Tours – Monastery360</title>
+  <meta name="description" content="Take immersive 360° virtual tours of Sikkim's most sacred monasteries. Explore Rumtek, Pemayangtse, Tashiding and more." />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#FF9933" />
+  <link rel="apple-touch-icon" href="images/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css"/>
+  <link rel="stylesheet" href="css/globals.css" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+  <script src="js/auth.js"></script>
+  <style>
+    /* Tour-page specific extras */
+    .tour-page-bg { background: var(--cream); }
+    .tour-selector-pills {
+      display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 28px;
+    }
+    .tour-pill {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 20px; border-radius: var(--radius-full);
+      border: 2px solid var(--cream-dark); background: var(--white);
+      font-size: 0.88rem; font-weight: 600; color: var(--text-secondary);
+      cursor: pointer; transition: var(--transition-bounce);
+    }
+    .tour-pill:hover { border-color: var(--saffron); color: var(--saffron-dark); transform: translateY(-2px); }
+    .tour-pill.active { background: linear-gradient(135deg,var(--saffron),var(--saffron-dark)); border-color: var(--saffron); color: white; box-shadow: var(--shadow-warm); }
+    .tour-pill img { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; }
+
+    /* Pannellum-style panorama placeholder */
+    .panorama-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, #0d0d1a 0%, #1a0a00 40%, #2d1000 60%, #0d0d1a 100%);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      position: relative; overflow: hidden; cursor: grab;
+    }
+    .panorama-placeholder:active { cursor: grabbing; }
+    .pano-scene {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      transition: transform 0.1s linear;
+    }
+    .pano-grain {
+      position: absolute; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      opacity: 0.04; pointer-events: none;
+    }
+    .pano-ui-hint {
+      position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%);
+      background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+      border-radius: var(--radius-full); padding: 8px 20px;
+      color: rgba(255,255,255,0.8); font-size: 0.82rem;
+      border: 1px solid rgba(255,255,255,0.15);
+      animation: float 3s ease-in-out infinite;
+    }
+    .video-frame {
+      width: 100%; height: 100%; border: none;
+      position: absolute; inset: 0;
+    }
+    .tour-transition { animation: tourFade 0.5s ease; }
+    @keyframes tourFade { from { opacity: 0; transform: scale(1.03); } to { opacity: 1; transform: scale(1); } }
+
+    .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 16px 0; }
+    .detail-chip {
+      background: var(--cream);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      border: 1px solid var(--cream-dark);
+    }
+    .detail-chip .chip-label { font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.08em; }
+    .detail-chip .chip-val { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-top: 2px; }
+
+    .highlights-list { list-style: none; display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+    .highlights-list li { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+    .highlights-list li::before { content: '✦'; color: var(--saffron); font-size: 0.7rem; flex-shrink: 0; }
+  </style>
+  <link rel="stylesheet" href="css/shared.css" />
+</head>
+<body class="tour-page-bg">
+
+<!-- ── Navbar ── -->
+<nav class="navbar scrolled" id="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">☸️</div>
+      Monastery<span style="color:var(--saffron)">360</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="calendar.html">📅 Festive Calendar</a></li>
+      <li><a href="tours.html" class="active">🎥 360° Tours</a></li>
+      <li><a href="gallery.html">🖼️ Culture Gallery</a></li>
+      <li><a href="stay.html">🏨 Stay & Booking</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-search-btn" id="searchBtn" title="Search">🔍</button>
+      <button class="nav-hamburger" id="navHamburger">☰</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Page Header ── -->
+<div class="page-header">
+  <div class="header-glow"></div>
+  <div class="container">
+    <h1>🎥 360° Virtual Tours</h1>
+    <p>Immerse yourself in Sikkim's sacred monasteries — rotate, zoom, and explore at your own pace</p>
+  </div>
+</div>
+
+<!-- ── Tours Section ── -->
+<section class="section">
+  <div class="container">
+
+    <!-- Event Context Banner (shown when navigated from calendar) -->
+    <div id="eventBanner" style="display:none;margin-bottom:24px;padding:20px 24px;border-radius:var(--radius-lg);background:linear-gradient(135deg,rgba(255,153,51,0.12),rgba(212,160,23,0.08));border:2px solid rgba(255,153,51,0.3)">
+      <div style="font-size:0.75rem;font-weight:700;color:var(--saffron);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:6px">🎯 Viewing from Calendar</div>
+      <h3 id="eventBannerTitle" style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:4px"></h3>
+      <p id="eventBannerDesc" style="font-size:0.88rem;color:var(--text-secondary)"></p>
+    </div>
+
+    <!-- Monastery Selector Pills -->
+    <div class="tour-selector-pills" id="monPills"></div>
+
+    <!-- Main Layout -->
+    <div class="tours-layout">
+
+      <!-- Left: Viewer -->
+      <div>
+        <!-- Panorama Viewer -->
+        <div class="panorama-placeholder" id="panoramaWrap" style="border-radius: var(--radius-lg); height: 500px; box-shadow: var(--shadow-md); position: relative; background: #e5e3df;">
+          <!-- The container for Pannellum API -->
+          <div id="pano" style="width:100%; height:100%; border-radius: var(--radius-lg); position: absolute; top:0; left:0; z-index: 1;"></div>
+          
+          <div class="viewer-overlay-info" style="position: absolute; top: 20px; left: 20px; z-index: 10; pointer-events: none;">
+            <div class="viewer-badge" style="background: rgba(0,0,0,0.6); color: white; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(4px);">
+              <span style="color: #4285F4; margin-right: 6px; font-size: 0.9rem;">⬤</span> PANNELLUM 360°
+            </div>
+            <div class="viewer-title" id="viewerTitle" style="color: white; font-size: 1.8rem; font-family: var(--font-heading); margin-top: 12px; text-shadow: 1px 2px 6px rgba(0,0,0,0.8); font-weight: 700;">Rumtek Monastery</div>
+          </div>
+        </div>
+
+        <!-- Monastery Navigation -->
+        <div class="monastery-nav">
+          <button class="mon-nav-btn" id="btnPrev">◀ Previous</button>
+          <span class="mon-position" id="monPosition">1 / 5</span>
+          <button class="mon-nav-btn" id="btnNext">Next ▶</button>
+        </div>
+
+        <!-- Thumbnail Strip -->
+        <div class="tour-thumbs" id="tourThumbs"></div>
+      </div>
+
+      <!-- Right: Info Panel -->
+      <div class="tour-info-panel">
+        <!-- Monastery Info -->
+        <div class="info-card" id="infoCard">
+          <div class="info-card-header">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div>
+                <div class="badge badge-saffron" id="infoSect" style="margin-bottom:8px"></div>
+                <h3 id="infoName"></h3>
+                <p style="font-size:0.85rem;color:rgba(255,255,255,0.7);margin-top:4px" id="infoAlt"></p>
+              </div>
+              <div style="font-size:2rem">🏯</div>
+            </div>
+          </div>
+          <div class="info-card-body">
+            <p style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;margin-bottom:16px" id="infoDesc"></p>
+            <div class="detail-grid" id="infoDetailGrid"></div>
+            <div style="margin-top:12px">
+              <div style="font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px">Highlights</div>
+              <ul class="highlights-list" id="infoHighlights"></ul>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;margin:16px 0">
+              <span class="stars" id="infoStars"></span>
+              <span style="font-size:0.85rem;color:var(--text-muted)" id="infoRating"></span>
+            </div>
+            <div style="display:flex;gap:8px">
+              <a href="stay.html" class="btn btn-primary" style="flex:1;justify-content:center;font-size:0.85rem;padding:10px">🏨 Book Stay</a>
+              <a href="calendar.html" class="btn btn-secondary" style="flex:1;justify-content:center;font-size:0.85rem;padding:10px">📅 Events</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Event Highlight (shown from calendar) -->
+        <div class="event-highlight" id="eventHighlight" style="display:none">
+          <div class="event-highlight-tag">🎭 Festival at this Monastery</div>
+          <h3 id="ehTitle"></h3>
+          <div class="event-date-str" id="ehDate"></div>
+          <p id="ehDesc"></p>
+          <a href="calendar.html" class="btn btn-gold" style="margin-top:14px;font-size:0.85rem;padding:10px 20px">📅 View All Events</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Search Modal ── -->
+<div class="modal-overlay" id="searchModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 style="font-family:var(--font-heading)">Search Monastery360</h3>
+      <button class="modal-close" id="searchClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search monasteries, events, hotels…" />
+      </div>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer style="background:var(--deep);color:rgba(255,255,255,0.6);padding:32px 0;text-align:center;font-size:0.85rem">
+  <div class="container">
+    <a href="index.html" style="color:var(--saffron);font-family:var(--font-heading);font-size:1.1rem;font-weight:700">☸️ Monastery360</a>
+    <p style="margin-top:8px">© 2026 Monastery360 · Sacred Sikkim Heritage</p>
+  </div>
+</footer>
+
+<script src="js/pano_b64.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function() {
+
+let currentIdx = 0;
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── Read URL Params ──────────────────────────────────────────
+const params = new URLSearchParams(window.location.search);
+const paramId    = params.get('id');
+const paramEvent = params.get('event');
+
+let panorama;
+
+// ── Init ────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function() {
+  if (!window.M360Data) return;
+  const mons = M360Data.monasteries;
+
+  if (paramId) {
+    const idx = mons.findIndex(m => m.id === paramId);
+    if (idx !== -1) currentIdx = idx;
+  }
+
+  renderPills(mons);
+  renderThumbs(mons);
+  
+  // Wait a small delay to ensure Pannellum library is fully initialized
+  setTimeout(() => {
+    loadMonastery(currentIdx);
+  }, 300);
+  
+  loadEventContext();
+  initViewerControls();
+});
+
+// ── Render Pills ─────────────────────────────────────────────
+function renderPills(mons) {
+  const container = document.getElementById('monPills');
+  if (!container) return;
+  container.innerHTML = mons.map((m,i) => `
+    <button class="tour-pill ${i===currentIdx?'active':''}" id="pill-${i}" onclick="switchTo(${i})">
+      <img src="${m.img}" alt="${m.name}" onerror="this.src='images/rumtek.png'" />
+      ${m.name.split(' ')[0]}
+    </button>
+  `).join('');
+}
+
+// ── Render Thumbs ─────────────────────────────────────────────
+function renderThumbs(mons) {
+  const container = document.getElementById('tourThumbs');
+  if (!container) return;
+  container.innerHTML = mons.map((m,i) => `
+    <div class="tour-thumb ${i===currentIdx?'active':''}" id="thumb-${i}" onclick="switchTo(${i})">
+      <img src="${m.img}" alt="${m.name}" onerror="this.src='images/rumtek.png'" />
+    </div>
+  `).join('');
+}
+
+// ── Load Monastery ───────────────────────────────────────────
+window.switchTo = function(idx) {
+  const mons = M360Data.monasteries;
+  if (idx < 0 || idx >= mons.length) return;
+  currentIdx = idx;
+
+  // Update active states
+  document.querySelectorAll('.tour-pill').forEach((p,i) => p.classList.toggle('active', i===idx));
+  document.querySelectorAll('.tour-thumb').forEach((t,i) => t.classList.toggle('active', i===idx));
+
+  loadMonastery(idx);
+};
+
+function loadMonastery(idx) {
+  const mons = M360Data.monasteries;
+  const m = mons[idx];
+  if (!m) return;
+
+  // Initialize/Update Pannellum Viewer
+  if (window.pannellum) {
+    function initPannellum(srcUrl) {
+      if (panorama) {
+        try { panorama.destroy(); } catch(e) {}
+      }
+      try {
+        panorama = pannellum.viewer('pano', {
+          type: "equirectangular",
+          panorama: srcUrl,
+          autoLoad: true,
+          compass: false,
+          showFullscreenCtrl: false,
+          mouseZoom: true,
+          keyboardZoom: false,
+          hfov: 100,
+          pitch: -5,
+          yaw: 15,
+          errorCallback: function(err) {
+            console.warn('Pannellum panorama error:', err);
+            if (window.M360_PANO_PLACEHOLDERS) {
+              const fallbackPano = window.M360_PANO_PLACEHOLDERS[m.id] || window.M360_PANO_PLACEHOLDERS.rumtek;
+              if (srcUrl !== fallbackPano) {
+                setTimeout(() => initPannellum(fallbackPano), 100);
+              }
+            }
+          }
+        });
+      } catch (err) {
+        console.warn('Pannellum initialization caught error:', err);
+        if (window.M360_PANO_PLACEHOLDERS) {
+          const fallbackPano = window.M360_PANO_PLACEHOLDERS[m.id] || window.M360_PANO_PLACEHOLDERS.rumtek;
+          if (srcUrl !== fallbackPano) {
+            initPannellum(fallbackPano);
+          }
+        }
+      }
+    }
+
+    const panoImg = m.panoImg || m.img || 'images/rumtek_pano.png';
+    initPannellum(panoImg);
+  }
+
+  const wrap = document.getElementById('panoramaWrap');
+  if (wrap) { wrap.classList.remove('tour-transition'); void wrap.offsetWidth; wrap.classList.add('tour-transition'); }
+
+  document.getElementById('viewerTitle').textContent = m.name;
+
+  // Info panel
+  document.getElementById('infoSect').textContent = `${m.sect} · Founded ${m.founded}`;
+  document.getElementById('infoName').textContent = m.name;
+  document.getElementById('infoAlt').textContent = m.alt;
+  document.getElementById('infoDesc').textContent = m.description;
+  document.getElementById('infoDetailGrid').innerHTML = `
+    <div class="detail-chip"><div class="chip-label">📍 Location</div><div class="chip-val">${m.location}</div></div>
+    <div class="detail-chip"><div class="chip-label">⏰ Timings</div><div class="chip-val">${m.timings}</div></div>
+    <div class="detail-chip"><div class="chip-label">🎟 Entry</div><div class="chip-val">${m.entryFee}</div></div>
+    <div class="detail-chip"><div class="chip-label">🌤 Best Time</div><div class="chip-val">${m.bestTime}</div></div>
+    <div class="detail-chip"><div class="chip-label">📏 Distance</div><div class="chip-val">${m.distance}</div></div>
+    <div class="detail-chip"><div class="chip-label">🙏 Sect</div><div class="chip-val">${m.sect}</div></div>
+  `;
+  document.getElementById('infoHighlights').innerHTML = m.highlights.map(h => `<li>${h}</li>`).join('');
+  document.getElementById('infoStars').textContent = '★'.repeat(Math.floor(m.rating)) + '☆'.repeat(5-Math.floor(m.rating));
+  document.getElementById('infoRating').textContent = `${m.rating} · ${m.reviews.toLocaleString()} reviews`;
+  document.getElementById('monPosition').textContent = `${idx+1} / ${mons.length}`;
+
+  document.getElementById('btnPrev').disabled = idx === 0;
+  document.getElementById('btnNext').disabled = idx === mons.length - 1;
+
+  if (typeof Auth !== 'undefined') {
+    Auth.recordVisit(m.name, m.id, m.img);
+  }
+}
+
+// ── Event Context ─────────────────────────────────────────────
+function loadEventContext() {
+  if (!paramEvent || !window.M360Data) return;
+  const ev = M360Data.events.find(e => e.id === paramEvent);
+  if (!ev) return;
+  const banner = document.getElementById('eventBanner');
+  if (banner) {
+    document.getElementById('eventBannerTitle').textContent = `${ev.emoji} ${ev.name}`;
+    document.getElementById('eventBannerDesc').textContent = ev.description;
+    banner.style.display = 'block';
+  }
+  const highlight = document.getElementById('eventHighlight');
+  if (highlight) {
+    document.getElementById('ehTitle').textContent = `${ev.emoji} ${ev.name}`;
+    document.getElementById('ehDate').textContent = `📅 ${MONTHS[ev.month-1]} ${ev.day}, 2026 · ${ev.duration}`;
+    document.getElementById('ehDesc').textContent = ev.description;
+    highlight.style.display = 'block';
+  }
+}
+
+// ── Viewer Controls ───────────────────────────────────────────
+function initViewerControls() {
+  document.getElementById('btnNext').addEventListener('click', () => {
+    const mons = M360Data.monasteries;
+    if (currentIdx < mons.length - 1) switchTo(currentIdx + 1);
+  });
+  document.getElementById('btnPrev').addEventListener('click', () => {
+    if (currentIdx > 0) switchTo(currentIdx - 1);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') switchTo(Math.min(currentIdx+1, M360Data.monasteries.length-1));
+    if (e.key === 'ArrowLeft')  switchTo(Math.max(currentIdx-1, 0));
+  });
+}
+
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+    });
+  }
+</script>
+</body>
+</html>

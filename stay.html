@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stay & Booking – Monastery360</title>
+  <meta name="description" content="Book the best hotels near Sikkim's monasteries. Filter by budget, rating, and distance. Plan your perfect monastery pilgrimage." />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#FF9933" />
+  <link rel="apple-touch-icon" href="images/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/globals.css" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+  <script src="js/auth.js"></script>
+  <style>
+    .stay-page-bg { background: var(--cream); }
+    .results-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+    }
+    .results-count { font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
+    .sort-select {
+      padding: 8px 16px; border: 2px solid var(--cream-dark);
+      border-radius: var(--radius-full); background: var(--white);
+      font-family: var(--font-body); font-size: 0.88rem;
+      outline: none; cursor: pointer;
+    }
+    /* Nearby events widget */
+    .events-widget {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--cream-dark);
+      margin-top: 20px;
+    }
+    .events-widget-header {
+      background: linear-gradient(135deg, var(--saffron) 0%, var(--saffron-dark) 100%);
+      padding: 16px 20px;
+      color: white;
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+    .events-widget-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--cream-dark);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .events-widget-item:last-child { border-bottom: none; }
+    .events-widget-item:hover { background: var(--cream); }
+    .events-widget-item .ev-icon { font-size: 1.5rem; }
+    .events-widget-item h4 { font-size: 0.88rem; margin-bottom: 2px; }
+    .events-widget-item p { font-size: 0.78rem; color: var(--text-secondary); }
+
+    /* ── Transport Section ── */
+    .transport-section {
+      background:
+        radial-gradient(ellipse 80% 60% at 10% 20%, rgba(255,153,51,0.18) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 80%, rgba(66,133,244,0.14) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(52,168,83,0.08) 0%, transparent 60%),
+        linear-gradient(135deg, #0d0700 0%, #1a0f00 40%, #0a1628 100%);
+      padding: 80px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    /* Grid pattern overlay */
+    .transport-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,153,51,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,153,51,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+    /* Glowing orb decorations */
+    .transport-section::after {
+      content: '';
+      position: absolute;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,153,51,0.12) 0%, transparent 70%);
+      top: -100px; right: -100px;
+      pointer-events: none;
+      animation: orbPulse 6s ease-in-out infinite;
+    }
+    @keyframes orbPulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 1; }
+    }
+    /* Floating particles */
+    .t-particle {
+      position: absolute;
+      border-radius: 50%;
+      pointer-events: none;
+      animation: tFloat linear infinite;
+      opacity: 0;
+    }
+    @keyframes tFloat {
+      0%   { transform: translateY(0) translateX(0); opacity: 0; }
+      10%  { opacity: 1; }
+      90%  { opacity: 0.6; }
+      100% { transform: translateY(-120px) translateX(20px); opacity: 0; }
+    }
+    .transport-tabs { display: flex; gap: 0; background: rgba(255,255,255,0.08); border-radius: var(--radius-xl); padding: 6px; margin-bottom: 36px; width: fit-content; }
+    .transport-tab {
+      padding: 12px 28px; border-radius: var(--radius-lg); font-size: 1rem; font-weight: 700;
+      font-family: var(--font-heading); cursor: pointer; border: none;
+      background: transparent; color: rgba(255,255,255,0.5); transition: all 0.3s ease;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .transport-tab.active { background: var(--saffron); color: white; box-shadow: 0 4px 20px rgba(255,153,51,0.4); }
+    .transport-panel { display: none; animation: fadeSlideIn 0.3s ease; }
+    .transport-panel.active { display: block; }
+    @keyframes fadeSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .transport-card {
+      background: rgba(255,255,255,0.06); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-xl);
+      padding: 32px; margin-bottom: 20px;
+    }
+    .transport-search-grid {
+      display: grid; grid-template-columns: 1fr 1fr auto; gap: 16px;
+      align-items: end; flex-wrap: wrap;
+    }
+    @media(max-width:768px) { .transport-search-grid { grid-template-columns: 1fr; } }
+    .transport-input-group label { display: block; font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+    .transport-input {
+      width: 100%; padding: 14px 18px; background: rgba(255,255,255,0.1);
+      border: 2px solid rgba(255,255,255,0.15); border-radius: var(--radius-md);
+      color: white; font-family: var(--font-body); font-size: 0.95rem;
+      outline: none; transition: border 0.3s;
+    }
+    .transport-input::placeholder { color: rgba(255,255,255,0.35); }
+    .transport-input:focus { border-color: var(--saffron); }
+    .transport-input option { background: #1a0f00; color: white; }
+    .transport-search-btn {
+      padding: 14px 32px; background: linear-gradient(135deg, var(--saffron), var(--saffron-dark));
+      color: white; border: none; border-radius: var(--radius-md);
+      font-family: var(--font-heading); font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: all 0.3s; white-space: nowrap;
+      box-shadow: 0 4px 20px rgba(255,153,51,0.35);
+    }
+    .transport-search-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(255,153,51,0.5); }
+    .transport-routes {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(280px,1fr)); gap: 16px; margin-top: 28px;
+    }
+    .route-card {
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--radius-lg); padding: 20px; transition: all 0.3s;
+      cursor: pointer;
+    }
+    .route-card:hover { background: rgba(255,153,51,0.1); border-color: rgba(255,153,51,0.4); transform: translateY(-3px); }
+    .route-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .route-name { font-family: var(--font-heading); font-size: 1rem; color: white; font-weight: 700; }
+    .route-badge { font-size: 0.72rem; padding: 3px 10px; border-radius: var(--radius-full); font-weight: 700; }
+    .badge-flight { background: rgba(66,133,244,0.25); color: #7ab4ff; border: 1px solid rgba(66,133,244,0.3); }
+    .badge-train  { background: rgba(52,168,83,0.25); color: #7dd49a; border: 1px solid rgba(52,168,83,0.3); }
+    .badge-bus    { background: rgba(251,188,5,0.25); color: #fdd663; border: 1px solid rgba(251,188,5,0.3); }
+    .route-meta { font-size: 0.82rem; color: rgba(255,255,255,0.5); margin-bottom: 8px; }
+    .route-price { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 800; color: var(--saffron); }
+    .route-book-btns { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+    .route-book-btn {
+      flex: 1; min-width: 80px; padding: 8px 12px; border: none; border-radius: var(--radius-md);
+      font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s;
+      text-align: center;
+    }
+    .route-book-btn:hover { filter: brightness(1.2); transform: scale(1.04); }
+  </style>
+  <link rel="stylesheet" href="css/shared.css" />
+<script src="js/auth.js"></script>
+</head>
+<body class="stay-page-bg">
+
+<!-- ── Navbar ── -->
+<nav class="navbar scrolled" id="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">☸️</div>
+      Monastery<span style="color:var(--saffron)">360</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="calendar.html">📅 Festive Calendar</a></li>
+      <li><a href="tours.html">🎥 360° Tours</a></li>
+      <li><a href="gallery.html">🖼️ Culture Gallery</a></li>
+      <li><a href="stay.html" class="active">🏨 Stay & Booking</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-search-btn" id="searchBtn" title="Search">🔍</button>
+      <button class="nav-hamburger" id="navHamburger">☰</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Page Header ── -->
+<div class="page-header">
+  <div class="header-glow"></div>
+  <div class="container">
+    <h1>🏨 Stay & Booking</h1>
+    <p>Handpicked hotels near Sikkim's most sacred monasteries — from heritage palaces to cozy eco-stays</p>
+  </div>
+</div>
+
+<!-- ── Stay Section ── -->
+<section class="section">
+  <div class="container">
+    <div class="stay-layout">
+
+      <!-- Sidebar Filters -->
+      <div class="stay-sidebar">
+        <div class="filter-card">
+          <h3>🔍 Filter Stays</h3>
+
+          <!-- Budget range -->
+          <div class="filter-group">
+            <label>💰 Budget per Night</label>
+            <input type="range" class="filter-range" id="budgetRange" min="1000" max="15000" step="500" value="15000" />
+            <div class="filter-range-labels">
+              <span>₹1,000</span>
+              <span id="budgetLabel">₹15,000+</span>
+            </div>
+          </div>
+
+          <!-- Rating -->
+          <div class="filter-group">
+            <label>⭐ Minimum Rating</label>
+            <div class="filter-stars">
+              <button class="star-filter-btn active" data-rating="0" id="star-0">All</button>
+              <button class="star-filter-btn" data-rating="3">3⭐</button>
+              <button class="star-filter-btn" data-rating="4">4⭐</button>
+              <button class="star-filter-btn" data-rating="4.5">4.5⭐</button>
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="filter-group">
+            <label>🏠 Category</label>
+            <div class="filter-checkboxes">
+              <label class="filter-checkbox-item" id="cb-luxury">
+                <input type="checkbox" value="luxury" checked /> Luxury
+              </label>
+              <label class="filter-checkbox-item" id="cb-heritage">
+                <input type="checkbox" value="heritage" checked /> Heritage
+              </label>
+              <label class="filter-checkbox-item" id="cb-boutique">
+                <input type="checkbox" value="boutique" checked /> Boutique / Eco
+              </label>
+              <label class="filter-checkbox-item" id="cb-budget">
+                <input type="checkbox" value="budget" checked /> Budget
+              </label>
+            </div>
+          </div>
+
+          <!-- Distance -->
+          <div class="filter-group">
+            <label>📏 Distance from Monastery</label>
+            <select id="distFilter" class="cal-filter-select" style="width:100%">
+              <option value="">Any distance</option>
+              <option value="5">Within 5 km</option>
+              <option value="15">Within 15 km</option>
+              <option value="30">Within 30 km</option>
+            </select>
+          </div>
+
+          <button class="btn btn-primary" id="resetFilters" style="width:100%;justify-content:center">Reset All Filters</button>
+        </div>
+
+        <!-- Nearby Events Widget -->
+        <div class="events-widget" data-reveal data-reveal-delay="2">
+          <div class="events-widget-header">🎭 Upcoming Nearby Events</div>
+          <div id="nearbyEventsList"></div>
+        </div>
+      </div>
+
+      <!-- Hotels List -->
+      <div>
+        <div class="results-header">
+          <div class="results-count" id="resultsCount">Showing 5 properties</div>
+          <select class="sort-select" id="sortSelect">
+            <option value="rating">Sort: Top Rated</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+          </select>
+        </div>
+
+        <div class="hotels-grid" id="hotelsGrid"></div>
+
+        <!-- No results -->
+        <div id="hotelsEmpty" style="display:none;text-align:center;padding:60px">
+          <div style="font-size:3rem;margin-bottom:16px">🏨</div>
+          <h3 style="font-family:var(--font-heading)">No hotels match your filters</h3>
+          <p style="color:var(--text-muted);margin-bottom:20px">Try adjusting your filters</p>
+          <button class="btn btn-primary" onclick="document.getElementById('resetFilters').click()">Reset Filters</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Interactive Trip Planner ── -->
+    <div class="trip-planner" id="trip-planner" data-reveal>
+      <div class="trip-planner-header">
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="font-size:2.2rem">🗺️</span>
+          <div>
+            <h2 style="font-size:1.6rem;color:white;margin:0 0 4px">Interactive Trip & Pilgrimage Planner</h2>
+            <p style="color:rgba(255,255,255,0.7);margin:0;font-size:0.92rem">Select sacred monasteries, customize your travel pace, and calculate your estimated tour cost</p>
+          </div>
+        </div>
+      </div>
+      <div class="trip-planner-body">
+        <div class="tp-section">
+          <h3>1. Select Monastery Stops</h3>
+          <p style="font-size:0.85rem;color:var(--text-secondary);margin-bottom:14px">Pick the monasteries you wish to include in your spiritual circuit:</p>
+          <div class="tp-stops" id="tpStops"><!-- Dynamically populated from M360Data.monasteries --></div>
+        </div>
+        <div class="tp-section">
+          <h3>2. Choose Travel Pace</h3>
+          <div class="tp-pace-options">
+            <label class="tp-pace-option">
+              <input type="radio" name="pace" value="relaxed" checked onchange="updateTripSummary()" />
+              <div class="tp-pace-card">
+                <div class="tp-pace-icon">🧘</div>
+                <div class="tp-pace-name">Relaxed Pace</div>
+                <div class="tp-pace-desc">3–4 days · 1 monastery/day · Deep meditation & prayer</div>
+              </div>
+            </label>
+            <label class="tp-pace-option">
+              <input type="radio" name="pace" value="moderate" onchange="updateTripSummary()" />
+              <div class="tp-pace-card">
+                <div class="tp-pace-icon">🚶</div>
+                <div class="tp-pace-name">Moderate Pace</div>
+                <div class="tp-pace-desc">5–6 days · Balanced visits, photography & cultural trails</div>
+              </div>
+            </label>
+            <label class="tp-pace-option">
+              <input type="radio" name="pace" value="intensive" onchange="updateTripSummary()" />
+              <div class="tp-pace-card">
+                <div class="tp-pace-icon">🏃</div>
+                <div class="tp-pace-name">Intensive Circuit</div>
+                <div class="tp-pace-desc">7+ days · Complete multi-district Himalayan expedition</div>
+              </div>
+            </label>
+          </div>
+        </div>
+        <div class="tp-section">
+          <h3>3. Itinerary & Estimated Cost Summary</h3>
+          <div class="tp-summary">
+            <div class="tp-summary-row"><span>Selected Monasteries:</span><span id="tpStopCount" style="font-weight:700">0</span></div>
+            <div class="tp-summary-row"><span>Selected Pace:</span><span id="tpPaceLabel" style="font-weight:700">Relaxed</span></div>
+            <div class="tp-summary-row"><span>Estimated Transport (Local Shared/Taxi):</span><span id="tpTransportCost">₹0</span></div>
+            <div class="tp-summary-row"><span>Estimated Accommodation:</span><span id="tpStayCost">₹0</span></div>
+            <div class="tp-summary-row tp-total"><span>Total Estimated Budget:</span><span id="tpTotalCost">₹0</span></div>
+          </div>
+          <div style="margin-top:20px">
+            <label style="display:block;font-size:0.85rem;font-weight:600;color:var(--text-secondary);margin-bottom:6px">Trip Plan Name</label>
+            <input type="text" id="tpPlanName" placeholder="e.g., Sacred Monasteries Circuit 2026" style="width:100%;padding:12px 16px;border:2px solid var(--cream-dark);border-radius:var(--radius-md);font-family:var(--font-body);font-size:0.95rem;outline:none" />
+          </div>
+          <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn btn-primary" id="tpSaveBtn" style="flex:1;justify-content:center;padding:14px 28px;font-size:1rem" onclick="saveTripPlan()">📋 Save Plan to Profile</button>
+            <button class="btn btn-secondary" style="padding:14px 20px" onclick="resetTripPlan()">🔄 Clear Selection</button>
+          </div>
+          <p id="tpLoginNotice" style="display:none;font-size:0.85rem;color:var(--text-muted);margin-top:12px;text-align:center">
+            🔒 <a href="login.html" style="color:var(--saffron);font-weight:600">Sign in</a> to save plans to your dashboard across devices.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Trip Banner -->
+    <div class="plan-trip-banner" data-reveal>
+      <h2>✨ Plan Your Perfect Monastery Trip</h2>
+      <p>Let us help you create an itinerary combining monastery visits, festivals & stays</p>
+      <div class="plan-trip-steps">
+        <div class="trip-step">
+          <div class="trip-step-icon">📅</div>
+          <div class="trip-step-label">1. Pick a Festival</div>
+        </div>
+        <div class="trip-step">
+          <div class="trip-step-icon">🏯</div>
+          <div class="trip-step-label">2. Choose Monasteries</div>
+        </div>
+        <div class="trip-step">
+          <div class="trip-step-icon">🏨</div>
+          <div class="trip-step-label">3. Book Your Stay</div>
+        </div>
+        <div class="trip-step">
+          <div class="trip-step-icon">🚕</div>
+          <div class="trip-step-label">4. Travel Sikkim</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a href="calendar.html" class="btn btn-gold">📅 Browse Festivals</a>
+        <a href="tours.html" class="btn btn-outline-white">🎥 Virtual Preview</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Transport Booking Section ── -->
+<section class="transport-section" id="transport">
+
+  <!-- Decorative background blobs + particles -->
+  <div style="position:absolute;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(66,133,244,0.15) 0%,transparent 70%);bottom:-80px;left:-80px;pointer-events:none;animation:orbPulse 8s ease-in-out infinite 2s"></div>
+  <div style="position:absolute;width:200px;height:200px;border-radius:50%;background:radial-gradient(circle,rgba(52,168,83,0.12) 0%,transparent 70%);top:40%;left:45%;pointer-events:none;animation:orbPulse 5s ease-in-out infinite 1s"></div>
+  <span class="t-particle" style="width:6px;height:6px;background:rgba(255,153,51,0.6);left:12%;top:80%;animation-duration:7s;animation-delay:0s"></span>
+  <span class="t-particle" style="width:4px;height:4px;background:rgba(66,133,244,0.7);left:25%;top:70%;animation-duration:9s;animation-delay:1.5s"></span>
+  <span class="t-particle" style="width:8px;height:8px;background:rgba(255,153,51,0.4);left:60%;top:85%;animation-duration:6s;animation-delay:0.8s"></span>
+  <span class="t-particle" style="width:5px;height:5px;background:rgba(255,220,100,0.5);left:75%;top:75%;animation-duration:11s;animation-delay:2s"></span>
+  <span class="t-particle" style="width:4px;height:4px;background:rgba(52,168,83,0.6);left:88%;top:65%;animation-duration:8s;animation-delay:0.3s"></span>
+  <span class="t-particle" style="width:7px;height:7px;background:rgba(255,153,51,0.3);left:40%;top:90%;animation-duration:10s;animation-delay:3s"></span>
+
+  <div class="container">
+    <div class="section-header" style="text-align:left;margin-bottom:32px">
+      <span class="eyebrow" style="color:var(--saffron-light)">🚀 Get There</span>
+      <h2 class="section-title" style="color:white">Book Your Transport to Sikkim</h2>
+      <p class="section-subtitle" style="color:rgba(255,255,255,0.6)">Flights, trains and buses — all in one place. Find the best routes to reach the monasteries.</p>
+    </div>
+
+    <!-- Mode Tabs -->
+    <div class="transport-tabs" id="transportTabs">
+      <button class="transport-tab active" data-mode="flights" id="tab-flights">✈️ Flights</button>
+      <button class="transport-tab" data-mode="trains" id="tab-trains">🚂 Trains</button>
+      <button class="transport-tab" data-mode="buses" id="tab-buses">🚌 Buses</button>
+    </div>
+
+    <!-- Flights Panel -->
+    <div class="transport-panel active" id="panel-flights">
+      <div class="transport-card">
+        <div class="transport-search-grid">
+          <div class="transport-input-group">
+            <label>From</label>
+            <select class="transport-input" id="flight-from">
+              <option value="DEL">Delhi (DEL)</option>
+              <option value="CCU">Kolkata (CCU)</option>
+              <option value="BOM">Mumbai (BOM)</option>
+              <option value="BLR">Bangalore (BLR)</option>
+              <option value="HYD">Hyderabad (HYD)</option>
+            </select>
+          </div>
+          <div class="transport-input-group">
+            <label>To</label>
+            <select class="transport-input" id="flight-to">
+              <option value="IXB">Bagdogra (IXB) – Nearest Airport</option>
+              <option value="GAU">Guwahati (GAU)</option>
+              <option value="CCU">Kolkata (CCU)</option>
+            </select>
+          </div>
+          <div class="transport-input-group">
+            <label>Date</label>
+            <input type="date" class="transport-input" id="flight-date" />
+          </div>
+          <button class="transport-search-btn" onclick="searchTransport('flight')" id="search-flights-btn">🔍 Search Flights</button>
+        </div>
+      </div>
+      <div class="transport-routes" id="flight-routes"></div>
+    </div>
+
+    <!-- Trains Panel -->
+    <div class="transport-panel" id="panel-trains">
+      <div class="transport-card">
+        <div class="transport-search-grid">
+          <div class="transport-input-group">
+            <label>From Station</label>
+            <select class="transport-input" id="train-from">
+              <option>New Delhi (NDLS)</option>
+              <option>Kolkata Howrah (HWH)</option>
+              <option>Sealdah (SDAH)</option>
+              <option>Guwahati (GHY)</option>
+              <option>Patna (PNBE)</option>
+            </select>
+          </div>
+          <div class="transport-input-group">
+            <label>To Station</label>
+            <select class="transport-input" id="train-to">
+              <option>New Jalpaiguri (NJP)</option>
+              <option>Siliguri Town (SGUJ)</option>
+              <option>New Alipurduar (NOQ)</option>
+            </select>
+          </div>
+          <div class="transport-input-group">
+            <label>Date</label>
+            <input type="date" class="transport-input" id="train-date" />
+          </div>
+          <button class="transport-search-btn" onclick="searchTransport('train')" id="search-trains-btn">🔍 Search Trains</button>
+        </div>
+      </div>
+      <div class="transport-routes" id="train-routes"></div>
+    </div>
+
+    <!-- Buses Panel -->
+    <div class="transport-panel" id="panel-buses">
+      <div class="transport-card">
+        <div class="transport-search-grid">
+          <div class="transport-input-group">
+            <label>From</label>
+            <select class="transport-input" id="bus-from">
+              <option>Siliguri</option>
+              <option>Darjeeling</option>
+              <option>New Jalpaiguri</option>
+              <option>Kalimpong</option>
+            </select>
+          </div>
+          <div class="transport-input-group">
+            <label>To</label>
+            <select class="transport-input" id="bus-to">
+              <option>Gangtok</option>
+              <option>Pelling</option>
+              <option>Namchi</option>
+              <option>Ravangla</option>
+              <option>Yuksom</option>
+            </select>
+          </div>
+          <div class="transport-input-group">
+            <label>Date</label>
+            <input type="date" class="transport-input" id="bus-date" />
+          </div>
+          <button class="transport-search-btn" onclick="searchTransport('bus')" id="search-buses-btn">🔍 Search Buses</button>
+        </div>
+      </div>
+      <div class="transport-routes" id="bus-routes"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Booking Modal ── -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h3 style="font-family:var(--font-heading);font-size:1.2rem" id="bookingHotelName">Hotel Name</h3>
+        <p style="font-size:0.85rem;color:var(--text-muted);margin-top:4px">Select dates to check availability on booking platforms</p>
+      </div>
+      <button class="modal-close" id="bookingClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div>
+          <label style="font-size:0.8rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Check-in</label>
+          <input type="date" id="bookCheckIn" style="width:100%;padding:10px 14px;border:2px solid var(--cream-dark);border-radius:var(--radius-md);font-family:var(--font-body);font-size:0.9rem;outline:none" />
+        </div>
+        <div>
+          <label style="font-size:0.8rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Check-out</label>
+          <input type="date" id="bookCheckOut" style="width:100%;padding:10px 14px;border:2px solid var(--cream-dark);border-radius:var(--radius-md);font-family:var(--font-body);font-size:0.9rem;outline:none" />
+        </div>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:0.8rem;font-weight:600;color:var(--text-muted);display:block;margin-bottom:6px">Guests</label>
+        <select style="width:100%;padding:10px 14px;border:2px solid var(--cream-dark);border-radius:var(--radius-md);font-family:var(--font-body);font-size:0.9rem;outline:none;background:var(--white)">
+          <option>1 Adult</option>
+          <option>2 Adults</option>
+          <option>2 Adults, 1 Child</option>
+          <option>4 Adults</option>
+        </select>
+      </div>
+      <div id="bookingPricePreview" style="padding:16px;background:var(--cream);border-radius:var(--radius-md);margin-bottom:16px;text-align:center">
+        <div style="font-size:0.8rem;color:var(--text-muted)">Estimated total cost</div>
+        <div style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;color:var(--saffron-dark)" id="bookingPrice">₹0</div>
+        <div style="font-size:0.75rem;color:var(--text-muted)">for 3 nights · per room</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <button class="btn" style="width:100%;justify-content:center;font-size:0.95rem;padding:12px;background:#003580;color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-weight:600;display:flex;align-items:center;gap:6px" onclick="confirmBooking()">
+          Booking.com ↗
+        </button>
+        <button class="btn" style="width:100%;justify-content:center;font-size:0.95rem;padding:12px;background:#da251d;color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-weight:600;display:flex;align-items:center;gap:6px" onclick="confirmBookingMMT()">
+          MakeMyTrip ↗
+        </button>
+        <button class="btn" style="width:100%;justify-content:center;font-size:0.95rem;padding:12px;background:#0050A4;color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-weight:600;display:flex;align-items:center;gap:6px" onclick="confirmBookingAgoda()">
+          Agoda ↗
+        </button>
+        <button class="btn" style="width:100%;justify-content:center;font-size:0.95rem;padding:12px;background:#0000a0;color:white;border:none;border-radius:var(--radius-md);cursor:pointer;font-weight:600;display:flex;align-items:center;gap:6px" onclick="confirmBookingExpedia()">
+          Expedia ↗
+        </button>
+      </div>
+      <p style="font-size:0.78rem;color:var(--text-muted);text-align:center;margin-top:14px">You will be securely redirected to complete your reservation.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ── Search Modal ── -->
+<div class="modal-overlay" id="searchModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 style="font-family:var(--font-heading)">Search Monastery360</h3>
+      <button class="modal-close" id="searchClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search monasteries, events, hotels…" />
+      </div>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer style="background:var(--deep);color:rgba(255,255,255,0.6);padding:32px 0;text-align:center;font-size:0.85rem">
+  <div class="container">
+    <a href="index.html" style="color:var(--saffron);font-family:var(--font-heading);font-size:1.1rem;font-weight:700">☸️ Monastery360</a>
+    <p style="margin-top:8px">© 2026 Monastery360 · Sacred Sikkim Heritage</p>
+  </div>
+</footer>
+
+<script src="js/pano_b64.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function() {
+
+let maxBudget   = 15000;
+let minRating   = 0;
+let activeCategories = ['luxury','heritage','boutique','budget'];
+let maxDist     = 999;
+let sortBy      = 'rating';
+let selectedHotelPrice = 0;
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── Render Hotels ─────────────────────────────────────────────
+function renderHotels() {
+  if (!window.M360Data) return;
+  let hotels = [...M360Data.hotels];
+
+  // Filter
+  hotels = hotels.filter(h => {
+    const budgetOk   = h.priceMin <= maxBudget;
+    const ratingOk   = h.rating >= minRating;
+    const categoryOk = activeCategories.includes(h.category);
+    const distNum    = parseFloat(h.distance);
+    const distOk     = maxDist === 999 || isNaN(distNum) || distNum <= maxDist;
+    return budgetOk && ratingOk && categoryOk && distOk;
+  });
+
+  // Sort
+  if (sortBy === 'rating')       hotels.sort((a,b) => b.rating - a.rating);
+  if (sortBy === 'price-asc')    hotels.sort((a,b) => a.priceMin - b.priceMin);
+  if (sortBy === 'price-desc')   hotels.sort((a,b) => b.priceMin - a.priceMin);
+
+  const grid  = document.getElementById('hotelsGrid');
+  const empty = document.getElementById('hotelsEmpty');
+  document.getElementById('resultsCount').textContent = `Showing ${hotels.length} propert${hotels.length===1?'y':'ies'}`;
+
+  if (hotels.length === 0) {
+    grid.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  const catLabel = { luxury: '✨ Luxury', heritage: '🏰 Heritage', boutique: '🌿 Boutique', budget: '💰 Budget' };
+  const catColor = { luxury: 'badge-gold', heritage: 'badge-maroon', boutique: 'badge-teal', budget: 'badge-saffron' };
+
+  grid.innerHTML = hotels.map((h, i) => `
+    <div class="hotel-card" data-reveal data-reveal-delay="${(i%3)+1}">
+      <div class="hotel-img-wrap">
+        <img class="hotel-img" src="${h.img}" alt="${h.name}" onerror="this.src='images/rumtek.png'" />
+        <div class="hotel-img-badge">${h.badge}</div>
+      </div>
+      <div class="hotel-body">
+        <div>
+          <div class="hotel-meta">
+            <span class="badge ${catColor[h.category]}">${catLabel[h.category]}</span>
+            <div class="stars">${'★'.repeat(Math.floor(h.rating))}${'☆'.repeat(5-Math.floor(h.rating))}</div>
+          </div>
+          <h3 class="hotel-name">${h.name}</h3>
+          <div class="hotel-location">📍 ${h.location}</div>
+          <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:12px;line-height:1.6">${h.desc}</p>
+          <div class="hotel-amenities">
+            ${h.amenities.map(a => `<span class="tag">${a}</span>`).join('')}
+          </div>
+        </div>
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;margin-top:auto;padding-top:12px;border-top:1px solid var(--cream-dark)">
+          <div>
+            <div class="hotel-price">
+               <span class="price-num">₹${h.priceMin.toLocaleString()}</span>
+              <span class="per-night"> – ₹${h.priceMax.toLocaleString()} / night</span>
+            </div>
+            <div class="hotel-distance">🏯 ${h.distance} from nearest monastery</div>
+          </div>
+          <div class="hotel-actions">
+            <button class="btn btn-primary" onclick="openBooking('${h.id}')" style="font-size:0.85rem;padding:10px 20px">Check Availability</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Re-trigger scroll reveal for new items so they actually show up
+  setTimeout(() => {
+    document.querySelectorAll('[data-reveal]').forEach(el => {
+      if (!el.classList.contains('revealed')) {
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(e => {
+            if (e.isIntersecting) {
+              e.target.classList.add('revealed');
+              observer.unobserve(e.target);
+            }
+          });
+        }, { threshold: 0.1 });
+        observer.observe(el);
+      }
+    });
+  }, 100);
+}
+
+// ── Nearby Events Widget ──────────────────────────────────────
+function renderNearbyEvents() {
+  const list = document.getElementById('nearbyEventsList');
+  if (!list || !window.M360Data) return;
+  list.innerHTML = M360Data.events.slice(0, 4).map(ev => `
+    <div class="events-widget-item" onclick="window.location.href='calendar.html'">
+      <div class="ev-icon">${ev.emoji}</div>
+      <div>
+        <h4>${ev.name}</h4>
+        <p>${MONTHS[ev.month-1]} ${ev.day} · ${ev.monasteryName}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── Booking Modal ─────────────────────────────────────────────
+window.openBooking = function(hotelId) {
+  const hotel = M360Data.hotels.find(h => h.id === hotelId);
+  if (!hotel) return;
+  selectedHotelPrice = hotel.priceMin;
+  document.getElementById('bookingHotelName').textContent = hotel.name;
+  document.getElementById('bookingPrice').textContent = `₹${(hotel.priceMin * 3).toLocaleString()}`;
+
+  // Set default dates
+  const today = new Date();
+  const checkin  = new Date(today); checkin.setDate(today.getDate() + 7);
+  const checkout = new Date(today); checkout.setDate(today.getDate() + 10);
+  document.getElementById('bookCheckIn').valueAsDate  = checkin;
+  document.getElementById('bookCheckOut').valueAsDate = checkout;
+
+  document.getElementById('bookingModal').classList.add('open');
+};
+
+// Update price on date change
+['bookCheckIn','bookCheckOut'].forEach(id => {
+  document.getElementById(id)?.addEventListener('change', updateBookingPrice);
+});
+
+function updateBookingPrice() {
+  const checkIn  = new Date(document.getElementById('bookCheckIn').value);
+  const checkOut = new Date(document.getElementById('bookCheckOut').value);
+  if (checkIn && checkOut && checkOut > checkIn) {
+    const nights = Math.round((checkOut - checkIn) / (1000*60*60*24));
+    const total  = selectedHotelPrice * nights;
+    document.getElementById('bookingPrice').textContent = `₹${total.toLocaleString()}`;
+    document.querySelector('#bookingPricePreview div:nth-child(3)').textContent = `for ${nights} night${nights>1?'s':''} · per room`;
+  }
+}
+
+window.confirmBooking = function() {
+  const { hotelName, checkin, checkout } = getBookingDetails();
+  const targetUrl = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(hotelName + ' Sikkim')}&checkin=${checkin}&checkout=${checkout}`;
+  if (typeof showToast === 'function') showToast('Redirecting to Booking.com...');
+  window.open(targetUrl, '_blank');
+};
+
+window.confirmBookingMMT = function() {
+  const { hotelName, checkin, checkout } = getBookingDetails();
+  const targetUrl = `https://www.makemytrip.com/hotels/hotel-listing/?checkin=${checkin}&checkout=${checkout}&city=CTGGTK&searchText=${encodeURIComponent(hotelName)}`;
+  if (typeof showToast === 'function') showToast('Redirecting to MakeMyTrip...');
+  window.open(targetUrl, '_blank');
+};
+
+window.confirmBookingAgoda = function() {
+  const { hotelName, checkin, checkout } = getBookingDetails();
+  const targetUrl = `https://www.agoda.com/search?textToSearch=${encodeURIComponent(hotelName + ' Sikkim')}&checkIn=${checkin}&checkOut=${checkout}`;
+  if (typeof showToast === 'function') showToast('Redirecting to Agoda...');
+  window.open(targetUrl, '_blank');
+};
+
+window.confirmBookingExpedia = function() {
+  const { hotelName, checkin, checkout } = getBookingDetails();
+  const targetUrl = `https://www.expedia.com/Hotel-Search?destination=${encodeURIComponent(hotelName + ' Sikkim')}&startDate=${checkin}&endDate=${checkout}`;
+  if (typeof showToast === 'function') showToast('Redirecting to Expedia...');
+  window.open(targetUrl, '_blank');
+};
+
+function getBookingDetails() {
+  document.getElementById('bookingModal').classList.remove('open');
+  const details = {
+    hotelName: document.getElementById('bookingHotelName').textContent,
+    checkin: document.getElementById('bookCheckIn').value,
+    checkout: document.getElementById('bookCheckOut').value
+  };
+  const priceStr = document.getElementById('bookingPrice').textContent;
+  if(typeof Auth !== 'undefined') Auth.saveBooking('hotel', details.hotelName, priceStr, `${details.checkin} to ${details.checkout}`);
+  return details;
+}
+
+document.getElementById('bookingClose').addEventListener('click', () => {
+  document.getElementById('bookingModal').classList.remove('open');
+});
+
+// ── Filter Listeners ─────────────────────────────────────────
+document.getElementById('budgetRange').addEventListener('input', function() {
+  maxBudget = parseInt(this.value);
+  document.getElementById('budgetLabel').textContent = maxBudget >= 15000 ? '₹15,000+' : `₹${maxBudget.toLocaleString()}`;
+  renderHotels();
+});
+
+document.querySelectorAll('[data-rating]').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('[data-rating]').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    minRating = parseFloat(this.dataset.rating);
+    renderHotels();
+  });
+});
+
+document.querySelectorAll('.filter-checkboxes input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener('change', function() {
+    activeCategories = Array.from(document.querySelectorAll('.filter-checkboxes input:checked')).map(c => c.value);
+    renderHotels();
+  });
+});
+
+document.getElementById('distFilter').addEventListener('change', function() {
+  maxDist = this.value ? parseInt(this.value) : 999;
+  renderHotels();
+});
+
+document.getElementById('sortSelect').addEventListener('change', function() {
+  sortBy = this.value;
+  renderHotels();
+});
+
+document.getElementById('resetFilters').addEventListener('click', () => {
+  maxBudget = 15000; minRating = 0; activeCategories = ['luxury','heritage','boutique','budget']; maxDist = 999; sortBy = 'rating';
+  document.getElementById('budgetRange').value = 15000;
+  document.getElementById('budgetLabel').textContent = '₹15,000+';
+  document.querySelectorAll('[data-rating]').forEach(b => b.classList.toggle('active', b.dataset.rating === '0'));
+  document.querySelectorAll('.filter-checkboxes input').forEach(cb => cb.checked = true);
+  document.getElementById('distFilter').value = '';
+  document.getElementById('sortSelect').value = 'rating';
+  renderHotels();
+});
+
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  renderHotels();
+  renderNearbyEvents();
+  initTransport();
+  initTripPlanner();
+});
+
+// ── Transport Booking ─────────────────────────────────────────
+const TRANSPORT_DATA = {
+  flights: [
+    { name: 'Delhi → Bagdogra', carrier: 'IndiGo / Air India', duration: '2h 15m', price: '₹3,200', freq: 'Daily 6 flights', badge: 'badge-flight',
+      links: { mmt: 'https://www.makemytrip.com/flights/cheap-flights-from-del-to-ixb.html', goibibo: 'https://www.goibibo.com/flights/cheap-flights-from-del-to-ixb/', ixigo: 'https://www.ixigo.com/flights/search/DEL-IXB' } },
+    { name: 'Kolkata → Bagdogra', carrier: 'IndiGo / SpiceJet', duration: '1h 05m', price: '₹2,100', freq: 'Daily 8 flights', badge: 'badge-flight',
+      links: { mmt: 'https://www.makemytrip.com/flights/cheap-flights-from-ccu-to-ixb.html', goibibo: 'https://www.goibibo.com/flights/cheap-flights-from-ccu-to-ixb/', ixigo: 'https://www.ixigo.com/flights/search/CCU-IXB' } },
+    { name: 'Mumbai → Bagdogra', carrier: 'Air India / IndiGo', duration: '3h 30m', price: '₹5,400', freq: '5 flights/day', badge: 'badge-flight',
+      links: { mmt: 'https://www.makemytrip.com/flights/cheap-flights-from-bom-to-ixb.html', goibibo: 'https://www.goibibo.com/flights/cheap-flights-from-bom-to-ixb/', ixigo: 'https://www.ixigo.com/flights/search/BOM-IXB' } },
+  ],
+  trains: [
+    { name: 'Kolkata → New Jalpaiguri', carrier: 'Darjeeling Mail (12343)', duration: '8h 45m', price: '₹380 (SL)', freq: 'Daily', badge: 'badge-train',
+      links: { irctc: 'https://www.irctc.co.in/nget/train-search', ixigo: 'https://www.ixigo.com/trains/search/HWH-NJP', cleartrip: 'https://www.cleartrip.com/trains' } },
+    { name: 'Delhi → New Jalpaiguri', carrier: 'Sanghamitra Exp (12295)', duration: '24h 10m', price: '₹810 (SL)', freq: '3 per week', badge: 'badge-train',
+      links: { irctc: 'https://www.irctc.co.in/nget/train-search', ixigo: 'https://www.ixigo.com/trains/search/NDLS-NJP', cleartrip: 'https://www.cleartrip.com/trains' } },
+    { name: 'Guwahati → New Jalpaiguri', carrier: 'Intercity Exp (15959)', duration: '6h 20m', price: '₹260 (SL)', freq: 'Daily', badge: 'badge-train',
+      links: { irctc: 'https://www.irctc.co.in/nget/train-search', ixigo: 'https://www.ixigo.com/trains/search/GHY-NJP', cleartrip: 'https://www.cleartrip.com/trains' } },
+  ],
+  buses: [
+    { name: 'Siliguri → Gangtok', carrier: 'Sikkim SNT / Private', duration: '4h 30m', price: '₹180–₹350', freq: 'Every 30 min (6AM–6PM)', badge: 'badge-bus',
+      links: { redbus: 'https://www.redbus.in/bus-tickets/siliguri-to-gangtok', abhibus: 'https://www.abhibus.com/bus-tickets/siliguri-to-gangtok', mmt: 'https://www.makemytrip.com/bus-tickets/siliguri-to-gangtok-bus/' } },
+    { name: 'Siliguri → Pelling', carrier: 'Shared Jeep / SNT Bus', duration: '5h 00m', price: '₹280–₹450', freq: 'Morning departures', badge: 'badge-bus',
+      links: { redbus: 'https://www.redbus.in/bus-tickets/siliguri-to-pelling', abhibus: 'https://www.abhibus.com/bus-tickets/siliguri-to-pelling', mmt: 'https://www.makemytrip.com/bus-tickets/' } },
+    { name: 'Gangtok → Yuksom', carrier: 'Shared Jeep / SNT', duration: '3h 30m', price: '₹250–₹400', freq: 'Early morning only', badge: 'badge-bus',
+      links: { redbus: 'https://www.redbus.in/bus-tickets/gangtok-to-yuksom', abhibus: 'https://www.abhibus.com/', mmt: 'https://www.makemytrip.com/bus-tickets/' } },
+  ]
+};
+
+function initTransport() {
+  // Set default dates to tomorrow
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+  const dateStr = tomorrow.toISOString().split('T')[0];
+  ['flight-date','train-date','bus-date'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.value = dateStr;
+    }
+  });
+
+  // Tab switching
+  document.querySelectorAll('.transport-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.transport-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.transport-panel').forEach(p => p.classList.remove('active'));
+      this.classList.add('active');
+      const panelId = 'panel-' + this.dataset.mode;
+      const panel = document.getElementById(panelId);
+      if (panel) panel.classList.add('active');
+    });
+  });
+
+  // Auto-render all routes on load
+  renderRoutes('flight', TRANSPORT_DATA.flights, dateStr);
+  renderRoutes('train', TRANSPORT_DATA.trains, dateStr);
+  renderRoutes('bus', TRANSPORT_DATA.buses, dateStr);
+}
+
+window.searchTransport = function(mode) {
+  const dateMap = { flight: 'flight-date', train: 'train-date', bus: 'bus-date' };
+  const modeMap = { flight: 'flights', train: 'trains', bus: 'buses' };
+  const el = document.getElementById(dateMap[mode]);
+  const dateStr = el ? el.value : '';
+
+  const btnId = 'search-' + mode + 's-btn';
+  const btn = document.getElementById(btnId);
+  const originalText = btn ? btn.textContent : '';
+  if (btn) { btn.textContent = '⏳ Searching...'; btn.disabled = true; }
+
+  setTimeout(() => {
+    renderRoutes(mode, TRANSPORT_DATA[modeMap[mode]], dateStr);
+    if (btn) { btn.textContent = originalText; btn.disabled = false; }
+    if (typeof showToast === 'function') {
+      showToast('Showing best routes for ' + (dateStr || 'your selected date') + '!');
+    }
+  }, 500);
+};
+
+window.handleTransportBooking = function(url, mode, name, price, date) {
+  if(typeof Auth !== 'undefined') Auth.saveBooking(mode, name, price, date || 'N/A');
+  window.open(url, '_blank');
+};
+
+function renderRoutes(mode, routes, dateStr) {
+  const containerId = mode + '-routes';
+  const container = document.getElementById(containerId); if (!container) return;
+
+  const getDayMonthYear = (d) => d ? d.split('-').reverse().join('-') : '';
+
+  const bObj = {
+    flight: (r) => {
+       const mmtUrl = dateStr ? r.links.mmt + '?departure_date=' + dateStr : r.links.mmt;
+       const iboUrl = dateStr ? r.links.goibibo + '?date=' + dateStr : r.links.goibibo;
+       const ixiUrl = dateStr ? r.links.ixigo + '?date=' + dateStr : r.links.ixigo;
+       return `<button class="route-book-btn" style="background:#da251d;color:white" onclick="handleTransportBooking('${mmtUrl}','flight','${r.name}','${r.price}','${dateStr}')">MakeMyTrip ↗</button>
+      <button class="route-book-btn" style="background:#e84393;color:white" onclick="handleTransportBooking('${iboUrl}','flight','${r.name}','${r.price}','${dateStr}')">Goibibo ↗</button>
+      <button class="route-book-btn" style="background:#FF6600;color:white" onclick="handleTransportBooking('${ixiUrl}','flight','${r.name}','${r.price}','${dateStr}')">Ixigo ↗</button>`;
+    },
+    train: (r) => {
+       const ixiUrl = dateStr ? r.links.ixigo + '?date=' + dateStr : r.links.ixigo;
+       return `<button class="route-book-btn" style="background:#0073b1;color:white" onclick="handleTransportBooking('${r.links.irctc}','train','${r.name}','${r.price}','${dateStr}')">IRCTC ↗</button>
+      <button class="route-book-btn" style="background:#FF6600;color:white" onclick="handleTransportBooking('${ixiUrl}','train','${r.name}','${r.price}','${dateStr}')">Ixigo ↗</button>
+      <button class="route-book-btn" style="background:#e94560;color:white" onclick="handleTransportBooking('${r.links.cleartrip}','train','${r.name}','${r.price}','${dateStr}')">Cleartrip ↗</button>`;
+    },
+    bus: (r) => {
+       const redUrl = dateStr ? r.links.redbus + '?date=' + getDayMonthYear(dateStr) : r.links.redbus;
+       return `<button class="route-book-btn" style="background:#d71920;color:white" onclick="handleTransportBooking('${redUrl}','bus','${r.name}','${r.price}','${dateStr}')">redBus ↗</button>
+      <button class="route-book-btn" style="background:#e67e22;color:white" onclick="handleTransportBooking('${r.links.abhibus}','bus','${r.name}','${r.price}','${dateStr}')">AbhiBus ↗</button>
+      <button class="route-book-btn" style="background:#da251d;color:white" onclick="handleTransportBooking('${r.links.mmt}','bus','${r.name}','${r.price}','${dateStr}')">MakeMyTrip ↗</button>`;
+    }
+  };
+
+  const headerDate = dateStr 
+    ? `<div style="display:inline-flex;align-items:center;padding:4px 12px;background:rgba(255,153,51,0.1);color:var(--saffron-dark);border-radius:20px;font-size:0.8rem;font-weight:700;margin-bottom:12px;">📅 Showing matches for: ${dateStr.split('-').reverse().join('/')}</div>` 
+    : '';
+
+  container.innerHTML = headerDate + routes.map(r => `
+    <div class="route-card">
+      <div class="route-card-header">
+        <div class="route-name">${r.name}</div>
+        <span class="route-badge ${r.badge}">${r.badge === 'badge-flight' ? '✈ FLIGHT' : r.badge === 'badge-train' ? '🚂 TRAIN' : '🚌 BUS'}</span>
+      </div>
+      <div class="route-meta">🏢 ${r.carrier} &nbsp;·&nbsp; ⏱ ${r.duration} &nbsp;·&nbsp; 📅 ${r.freq}</div>
+      <div class="route-price">From ${r.price}</div>
+      <div class="route-book-btns">${bObj[mode](r)}</div>
+    </div>
+  `).join('');
+}
+
+// ── Trip Planner Logic ─────────────────────────────────────────
+function initTripPlanner() {
+  const container = document.getElementById('tpStops');
+  if (!container || !window.M360Data || !M360Data.monasteries) return;
+
+  container.innerHTML = M360Data.monasteries.map(m => `
+    <label class="tp-stop-item" id="tp-stop-${m.id}">
+      <input type="checkbox" value="${m.id}" onchange="updateTripSummary()" />
+      <img src="${m.img}" alt="${m.name}" class="tp-stop-img" onerror="this.src='images/rumtek.png'" />
+      <div style="flex:1;min-width:0">
+        <div class="tp-stop-name">${m.name}</div>
+        <div class="tp-stop-loc">📍 ${m.location} · ${m.sect || 'Sikkim'}</div>
+      </div>
+    </label>
+  `).join('');
+
+  if (typeof Auth !== 'undefined' && !Auth.getCurrentUser()) {
+    const notice = document.getElementById('tpLoginNotice');
+    if (notice) notice.style.display = 'block';
+  }
+
+  updateTripSummary();
+}
+
+window.updateTripSummary = function() {
+  const checked = Array.from(document.querySelectorAll('#tpStops input:checked'));
+  const stops = checked.map(c => c.value);
+  const pace = document.querySelector('input[name="pace"]:checked')?.value || 'relaxed';
+  const paceLabels = { relaxed: 'Relaxed (3–4 days)', moderate: 'Moderate (5–6 days)', intensive: 'Intensive (7+ days)' };
+  const paceDays = { relaxed: 3, moderate: 5, intensive: 7 };
+
+  document.querySelectorAll('.tp-stop-item').forEach(el => {
+    const input = el.querySelector('input');
+    el.classList.toggle('selected', input && input.checked);
+  });
+
+  const transportPerStop = 750;
+  const stayPerNight = 2800;
+  const tripDays = stops.length > 0 ? Math.max(stops.length, paceDays[pace]) : 0;
+  const transportCost = stops.length * transportPerStop;
+  const stayCost = tripDays * stayPerNight;
+  const total = transportCost + stayCost;
+
+  const countEl = document.getElementById('tpStopCount');
+  const paceEl = document.getElementById('tpPaceLabel');
+  const transEl = document.getElementById('tpTransportCost');
+  const stayEl = document.getElementById('tpStayCost');
+  const totalEl = document.getElementById('tpTotalCost');
+
+  if (countEl) countEl.textContent = `${stops.length} ${stops.length === 1 ? 'stop' : 'stops'}`;
+  if (paceEl) paceEl.textContent = paceLabels[pace] || 'Relaxed';
+  if (transEl) transEl.textContent = '₹' + transportCost.toLocaleString();
+  if (stayEl) stayEl.textContent = tripDays > 0 ? `₹${stayCost.toLocaleString()} (${tripDays} nights)` : '₹0';
+  if (totalEl) totalEl.textContent = '₹' + total.toLocaleString();
+};
+
+window.saveTripPlan = function() {
+  const checked = Array.from(document.querySelectorAll('#tpStops input:checked'));
+  const stops = checked.map(c => c.value);
+  if (stops.length === 0) {
+    if (typeof showToast === 'function') {
+      showToast('⚠️ Please select at least one monastery stop.');
+    } else {
+      alert('Please select at least one monastery stop.');
+    }
+    return;
+  }
+
+  const pace = document.querySelector('input[name="pace"]:checked')?.value || 'relaxed';
+  const nameInput = document.getElementById('tpPlanName');
+  const defaultName = `Sacred Sikkim Circuit (${stops.length} monasteries)`;
+  const planName = (nameInput && nameInput.value.trim()) ? nameInput.value.trim() : defaultName;
+  const totalText = document.getElementById('tpTotalCost')?.textContent || '₹0';
+  const estimatedCost = parseInt(totalText.replace(/[^0-9]/g, '')) || 0;
+
+  if (typeof Auth !== 'undefined' && !Auth.getCurrentUser()) {
+    if (typeof showToast === 'function') {
+      showToast('🔒 Please sign in to save your trip plan to your profile.', 3500);
+    } else {
+      alert('Please sign in to save your trip plan to your profile.');
+    }
+    const hint = document.getElementById('tpLoginHint');
+    if (hint) {
+      hint.style.display = 'block';
+      hint.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    return;
+  }
+
+  if (typeof Auth !== 'undefined') {
+    Auth.savePlan({
+      name: planName,
+      stops: stops,
+      pace: pace,
+      estimatedCost: estimatedCost,
+      createdAt: new Date().toISOString()
+    });
+
+    if (typeof showToast === 'function') {
+      showToast(`🎉 Trip plan "${planName}" saved to your profile!`);
+    } else {
+      alert(`Trip plan "${planName}" saved!`);
+    }
+  } else {
+    if (typeof showToast === 'function') {
+      showToast('⚠️ Auth service unavailable.');
+    }
+  }
+};
+
+window.resetTripPlan = function() {
+  document.querySelectorAll('#tpStops input:checked').forEach(c => { c.checked = false; });
+  document.querySelectorAll('.tp-stop-item').forEach(el => el.classList.remove('selected'));
+  const relaxedRadio = document.querySelector('input[name="pace"][value="relaxed"]');
+  if (relaxedRadio) relaxedRadio.checked = true;
+  const nameInput = document.getElementById('tpPlanName');
+  if (nameInput) nameInput.value = '';
+  updateTripSummary();
+  if (typeof showToast === 'function') showToast('Selection cleared.');
+};
+
+})();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+    });
+  }
+</script>
+</body>
+</html>

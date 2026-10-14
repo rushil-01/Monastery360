@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Monastery360 – Discover Sikkim's Sacred Monasteries</title>
+  <meta name="description"
+    content="Explore Sikkim's magnificent monasteries through immersive 360° tours, interactive maps, festive calendar and travel planning tools." />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#FF9933" />
+  <link rel="apple-touch-icon" href="images/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="css/globals.css" />
+  <link rel="stylesheet" href="css/home.css" />
+  <link rel="stylesheet" href="css/shared.css" />
+</head>
+
+<body class="home-page">
+
+  <!-- ── Navbar ── -->
+  <nav class="navbar" id="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="nav-logo">
+        <div class="logo-icon">☸️</div>
+        Monastery<span style="color:var(--saffron)">360</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html" class="active">🏠 Home</a></li>
+        <li><a href="calendar.html">📅 Festive Calendar</a></li>
+        <li><a href="tours.html">🎥 360° Tours</a></li>
+        <li><a href="gallery.html">🖼️ Culture Gallery</a></li>
+        <li><a href="stay.html">🏨 Stay & Booking</a></li>
+        <li><a href="stay.html#transport">🚀 Transport</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="nav-search-btn" id="searchBtn" title="Search (Ctrl+K)">🔍</button>
+        <button class="nav-hamburger" id="navHamburger">☰</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ── Hero ── -->
+  <section class="hero" id="hero">
+    <div class="prayer-flags"></div>
+    <div class="hero-bg" id="heroBg"></div>
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+      <div class="hero-eyebrow">
+        <span>🏔️</span> Sikkim's Sacred Heritage
+      </div>
+      <h1>Explore the<br /><span>Soul of Sikkim</span><br />Monasteries</h1>
+      <p class="hero-desc">
+        Journey through ancient Buddhist monasteries, immersive 360° virtual tours, vibrant festivals, and Himalayan
+        culture — all in one place.
+      </p>
+      <div class="hero-cta">
+        <a href="tours.html" class="btn btn-primary" id="hero-explore-btn">🎥 Start 360° Tour</a>
+        <a href="calendar.html" class="btn btn-outline-white" id="hero-calendar-btn">📅 Festival Calendar</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat-item">
+          <div class="hero-stat-num" data-counter="30" data-suffix="+">30+</div>
+          <div class="hero-stat-label">Monasteries</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-num" data-counter="15" data-suffix="+">15+</div>
+          <div class="hero-stat-label">Annual Festivals</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-num" data-counter="360" data-suffix="°">360°</div>
+          <div class="hero-stat-label">Virtual Tours</div>
+        </div>
+        <div class="hero-stat-item">
+          <div class="hero-stat-num" data-counter="1700" data-suffix="">1700</div>
+          <div class="hero-stat-label">Years of History</div>
+        </div>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <div class="scroll-mouse"></div>
+      Scroll to explore
+    </div>
+  </section>
+
+  <!-- ── Map Section ── -->
+  <section class="map-section">
+    <div class="container">
+      <div class="map-header" data-reveal>
+        <div class="section-header">
+          <span class="eyebrow">📍 Interactive Map</span>
+          <h2 class="section-title">Find Monasteries & Stays</h2>
+          <p class="section-subtitle">Click any marker to explore — orange for monasteries, white for hotels</p>
+        </div>
+      </div>
+      <div class="map-wrapper">
+        <div id="map" style="height:480px;width:100%;border-radius:16px;"></div>
+        <div class="map-legend">
+          <h4>Legend</h4>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#FF9933;border:2px solid white"></div>
+            <span>Monastery</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:#FFFFFF;border:2px solid #4A90E2"></div>
+            <span>Hotel / Stay</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Featured Monasteries ── -->
+  <section class="section" style="background:var(--white)">
+    <div class="container">
+      <div class="section-header" data-reveal>
+        <span class="eyebrow">🏯 Sacred Sites</span>
+        <h2 class="section-title">Featured Monasteries</h2>
+        <p class="section-subtitle">Discover the most revered Buddhist sanctuaries across the four districts of Sikkim
+        </p>
+      </div>
+      <div class="monasteries-grid" id="monasteriesGrid"></div>
+      <div style="text-align:center;margin-top:40px" data-reveal>
+        <a href="tours.html" class="btn btn-primary" id="view-all-monasteries-btn">Explore All Monasteries →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Facts Banner ── -->
+  <section class="facts-banner">
+    <div class="container">
+      <div class="facts-grid">
+        <div class="fact-item" data-reveal>
+          <div class="fact-num" data-counter="200" data-suffix="+">200+</div>
+          <div class="fact-label">Sacred Prayer Flags</div>
+        </div>
+        <div class="fact-item" data-reveal data-reveal-delay="2">
+          <div class="fact-num" data-counter="1700" data-suffix="">1700</div>
+          <div class="fact-label">Years of Buddhism in Sikkim</div>
+        </div>
+        <div class="fact-item" data-reveal data-reveal-delay="3">
+          <div class="fact-num" data-counter="4" data-suffix="">4</div>
+          <div class="fact-label">Buddhist Sects Present</div>
+        </div>
+        <div class="fact-item" data-reveal data-reveal-delay="4">
+          <div class="fact-num" data-counter="8586" data-suffix="m">8586m</div>
+          <div class="fact-label">Kanchenjunga – Guardian Peak</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Festivals Teaser ── -->
+  <section class="section festival-teaser">
+    <div class="container">
+      <div class="section-header" data-reveal>
+        <span class="eyebrow">🎉 Upcoming Festivals</span>
+        <h2 class="section-title">Mark Your Calendar</h2>
+        <p class="section-subtitle">Sikkim's vibrant Buddhist festivals are a once-in-a-lifetime experience</p>
+      </div>
+      <div class="festival-preview" id="festivalPreview"></div>
+      <div style="text-align:center;margin-top:36px" data-reveal>
+        <a href="calendar.html" class="btn btn-primary" id="view-full-calendar-btn">📅 View Full Festival Calendar</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Transport Teaser ── -->
+  <section id="transport-home" style="padding:80px 0;background:linear-gradient(160deg,#0d0800 0%,#1c1000 45%,#071020 100%);position:relative;overflow:hidden">
+
+    <!-- Decorative blobs -->
+    <div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,153,51,0.04)1px,transparent 1px),linear-gradient(90deg,rgba(255,153,51,0.04)1px,transparent 1px);background-size:52px 52px;pointer-events:none"></div>
+    <div style="position:absolute;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(255,153,51,0.13)0%,transparent 70%);top:-100px;right:-80px;pointer-events:none"></div>
+    <div style="position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(66,133,244,0.12)0%,transparent 70%);bottom:-60px;left:-60px;pointer-events:none"></div>
+
+    <div class="container" style="position:relative;z-index:1">
+
+      <!-- Header -->
+      <div style="margin-bottom:48px">
+        <span style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,153,51,0.15);border:1px solid rgba(255,153,51,0.3);padding:6px 18px;border-radius:999px;font-size:0.82rem;font-weight:700;color:#ffb347;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px">🚀 Get There Easily</span>
+        <h2 style="font-family:var(--font-heading);font-size:clamp(1.8rem,4vw,2.8rem);font-weight:800;color:white;margin-bottom:12px">Book Transport to Sikkim</h2>
+        <p style="font-size:1rem;color:rgba(255,255,255,0.55);max-width:520px">Flights, trains and buses — all routes to reach the sacred monasteries in one place</p>
+      </div>
+
+      <!-- 3 Cards -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px">
+
+        <!-- FLIGHTS -->
+        <div id="transport-flights-card" onclick="window.location.href='stay.html#transport'" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:28px;cursor:pointer;transition:all 0.3s;display:flex;flex-direction:column;gap:0" onmouseover="this.style.background='rgba(66,133,244,0.1)';this.style.borderColor='rgba(66,133,244,0.4)';this.style.transform='translateY(-5px)'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.1)';this.style.transform='translateY(0)'">
+          <!-- Card header -->
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.08)">
+            <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#4285F4,#1a56db);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 24px rgba(66,133,244,0.4);font-size:24px">✈️</div>
+            <div style="flex:1">
+              <div style="font-family:var(--font-heading);font-size:1.15rem;font-weight:800;color:white">✈️ Flights</div>
+              <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-top:2px">Fly into Bagdogra (IXB)</div>
+            </div>
+            <div style="font-size:1.5rem;color:rgba(255,255,255,0.2)">›</div>
+          </div>
+          <!-- Routes -->
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;flex:1">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:0.83rem">
+              <span style="color:white;font-weight:700">Delhi</span>
+              <span style="color:rgba(255,255,255,0.3);font-size:0.7rem">——✔——</span>
+              <span style="color:rgba(255,255,255,0.6)">Bagdogra</span>
+              <span style="color:#4285F4;font-weight:800;font-family:var(--font-heading)">₹3,200</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:0.83rem">
+              <span style="color:white;font-weight:700">Kolkata</span>
+              <span style="color:rgba(255,255,255,0.3);font-size:0.7rem">——✔——</span>
+              <span style="color:rgba(255,255,255,0.6)">Bagdogra</span>
+              <span style="color:#4285F4;font-weight:800;font-family:var(--font-heading)">₹2,100</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:0.83rem">
+              <span style="color:white;font-weight:700">Mumbai</span>
+              <span style="color:rgba(255,255,255,0.3);font-size:0.7rem">——✔——</span>
+              <span style="color:rgba(255,255,255,0.6)">Bagdogra</span>
+              <span style="color:#4285F4;font-weight:800;font-family:var(--font-heading)">₹5,400</span>
+            </div>
+          </div>
+          <!-- Platforms -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span style="padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;color:white;background:#da251d">MakeMyTrip</span>
+            <span style="padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;color:white;background:#e84393">Goibibo</span>
+            <span style="padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;color:white;background:#FF6600">Ixigo</span>
+          </div>
+        </div>
+
+        <!-- TRAINS -->
+        <div id="transport-trains-card" onclick="window.location.href='stay.html#transport'" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:28px;cursor:pointer;transition:all 0.3s;display:flex;flex-direction:column;gap:0" onmouseover="this.style.background='rgba(52,168,83,0.1)';this.style.borderColor='rgba(52,168,83,0.4)';this.style.transform='translateY(-5px)'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.1)';this.style.transform='translateY(0)'">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.08)">
+            <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#34A853,#1a7a3a);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 24px rgba(52,168,83,0.4);font-size:24px">🚂</div>
+            <div style="flex:1">
+              <div style="font-family:var(--font-heading);font-size:1.15rem;font-weight:800;color:white">🚂 Trains</div>
+              <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-top:2px">To New Jalpaiguri (NJP)</div>
+            </div>
+            <div style="font-size:1.5rem;color:rgba(255,255,255,0.2)">›</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;flex:1">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:0.83rem">
+              <span style="color:white;font-weight:700">Delhi</span>
+              <span style="color:rgba(255,255,255,0.3);font-size:0.7rem">——🚂——</span>
+              <span style="color:rgba(255,255,255,0.6)">NJP</span>
+              <span style="color:#34A853;font-weight:800;font-family:var(--font-heading)">₹810</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:0.83rem">
+              <span style="color:white;font-weight:700">Kolkata</span>
+              <span style="color:rgba(255,255,255,0.3);font-size:0.7rem">——🚂——</span>
+              <span style="color:rgba(255,255,255,0.6)">NJP</span>
+              <span style="color:#34A853;font-weight:800;font-family:var(--font-heading)">₹380</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:0.83rem">
+              <span style="color:white;font-weight:700">Guwahati</span>
+              <span style="color:rgba(255,255,255,0.3);font-size:0.7rem">——🚂——</span>
+              <span style="color:rgba(255,255,255,0.6)">NJP</span>
+              <span style="color:#34A853;font-weight:800;font-family:var(--font-heading)">₹260</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span style="padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;color:white;background:#003580">IRCTC</span>
+            <span style="padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;color:white;background:#FF6600">Ixigo</span>
+            <span style="padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;color:white;background:#e94560">Cleartrip</span>
+          </div>
+        </div>
+
+        <!-- BUSES -->
+        <div id="transport-buses-card" onclick="window.location.href='stay.html#transport'" style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:20px;padding:28px;cursor:pointer;transition:all 0.3s;display:flex;flex-direction:column;gap:0" onmouseover="this.style.background='rgba(251,188,5,0.1)';this.style.borderColor='rgba(251,188,5,0.4)';this.style.transform='translateY(-5px)'" onmouseout="this.style.background='rgba(255,255,255,0.04)';this.style.borderColor='rgba(255,255,255,0.1)';this.style.transform='translateY(0)'">
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:22px;padding-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.08)">
+            <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#FBBC05,#c49000);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 8px 24px rgba(251,188,5,0.35);font-size:24px">🚌</div>
+            <div style="flex:1">
+              <div style="font-family:var(--font-heading);font-size:1.15rem;font-weight:800;color:white">🚌 Buses</div>
+              <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-top:2px">Siliguri to Sikkim towns</div>
+            </div>
+            <div style="font-size:1.5rem;color:rgba(255,255,255,0.2)">›</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;flex:1">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:0.83rem">
+              <span style="color:white;font-weight:700">Siliguri</span>
+              <span style="color:rgba(255,255,255,0.3);font-size:0.7rem">——🚌——</span>
+              <span style="color:rgba(255,255,255,0.6)">Gangtok</span>
+              <span style="color:#FBBC05;font-weight:800;font-family:var(--font-heading)">₹180</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:0.83rem">
+              <span style="color:white;font-weight:700">Siliguri</span>
+              <span style="color:rgba(255,255,255,0.3);font-size:0.7rem">——🚌——</span>
+              <span style="color:rgba(255,255,255,0.6)">Pelling</span>
+              <span style="color:#FBBC05;font-weight:800;font-family:var(--font-heading)">₹280</span>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 14px;background:rgba(255,255,255,0.05);border-radius:10px;font-size:0.83rem">
+              <span style="color:white;font-weight:700">Gangtok</span>
+              <span style="color:rgba(255,255,255,0.3);font-size:0.7rem">——🚌——</span>
+              <span style="color:rgba(255,255,255,0.6)">Yuksom</span>
+              <span style="color:#FBBC05;font-weight:800;font-family:var(--font-heading)">₹250</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <span style="padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;color:white;background:#d71920">redBus</span>
+            <span style="padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;color:white;background:#e67e22">AbhiBus</span>
+            <span style="padding:4px 10px;border-radius:999px;font-size:0.72rem;font-weight:700;color:white;background:#da251d">MakeMyTrip</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CTA -->
+      <div style="text-align:center;margin-top:44px">
+        <a href="stay.html#transport" class="btn btn-primary" id="view-all-transport-btn" style="font-size:1rem;padding:14px 36px">🚀 Book Transport Now</a>
+      </div>
+
+    </div>
+  </section>
+
+
+
+  <!-- ── Search Modal ── -->
+  <div class="modal-overlay search-modal" id="searchModal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h3 style="font-family:var(--font-heading);font-size:1.3rem">Search Monastery360</h3>
+          <p style="font-size:0.85rem;color:var(--text-muted);margin-top:4px">Find monasteries, festivals & stays</p>
+        </div>
+        <button class="modal-close" id="searchClose">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="search-input-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search monasteries, events, hotels…" autocomplete="off" />
+        </div>
+        <div id="searchResults" class="search-results"></div>
+        <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--cream-dark)">
+          <p style="font-size:0.8rem;color:var(--text-muted)">Quick links:</p>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px">
+            <a href="tours.html?id=rumtek" class="tag" style="cursor:pointer">🏯 Rumtek</a>
+            <a href="calendar.html" class="tag" style="cursor:pointer">🎭 Losar</a>
+            <a href="gallery.html" class="tag" style="cursor:pointer">🖼️ Gallery</a>
+            <a href="stay.html" class="tag" style="cursor:pointer">🏨 Hotels</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <footer style="background:var(--deep);color:rgba(255,255,255,0.75);padding:48px 0 24px">
+    <div class="container">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:40px;margin-bottom:40px">
+        <div>
+          <div class="nav-logo" style="margin-bottom:12px">
+            <div class="logo-icon">☸️</div> Monastery<span style="color:var(--saffron)">360</span>
+          </div>
+          <p style="font-size:0.88rem;line-height:1.7">Your digital gateway to the sacred monasteries and vibrant
+            culture of Sikkim, India.</p>
+        </div>
+        <div>
+          <h4 style="font-family:var(--font-heading);color:var(--white);margin-bottom:14px">Explore</h4>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:0.88rem">
+            <li><a href="tours.html" style="color:rgba(255,255,255,0.7);transition:var(--transition)">360° Virtual
+                Tours</a></li>
+            <li><a href="calendar.html" style="color:rgba(255,255,255,0.7)">Festival Calendar</a></li>
+            <li><a href="gallery.html" style="color:rgba(255,255,255,0.7)">Culture Gallery</a></li>
+            <li><a href="stay.html" style="color:rgba(255,255,255,0.7)">Stay & Booking</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-family:var(--font-heading);color:var(--white);margin-bottom:14px">Popular Monasteries</h4>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:0.88rem">
+            <li><a href="tours.html?id=rumtek" style="color:rgba(255,255,255,0.7)">Rumtek Monastery</a></li>
+            <li><a href="tours.html?id=pemayangtse" style="color:rgba(255,255,255,0.7)">Pemayangtse</a></li>
+            <li><a href="tours.html?id=tashiding" style="color:rgba(255,255,255,0.7)">Tashiding Monastery</a></li>
+            <li><a href="tours.html?id=dodrul" style="color:rgba(255,255,255,0.7)">Do-Drul Chorten</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-family:var(--font-heading);color:var(--white);margin-bottom:14px">Contact</h4>
+          <p style="font-size:0.88rem;color:rgba(255,255,255,0.6);line-height:1.7">📍 Gangtok, Sikkim 737101<br />📧
+            info@monastery360.in<br />📞 +91 98760 12345</p>
+          <div style="display:flex;gap:10px;margin-top:14px">
+            <a href="#" style="color:var(--saffron);font-size:1.3rem">📘</a>
+            <a href="#" style="color:var(--saffron);font-size:1.3rem">📸</a>
+            <a href="#" style="color:var(--saffron);font-size:1.3rem">▶️</a>
+          </div>
+        </div>
+      </div>
+      <div
+        style="border-top:1px solid rgba(255,255,255,0.1);padding-top:24px;text-align:center;font-size:0.82rem;color:rgba(255,255,255,0.4)">
+        © 2026 Monastery360. Made with ❤️ for preserving Himalayan Buddhist heritage.
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/pano_b64.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    // ── Home Page Scripts ──────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+      const currentUser = (typeof Auth !== 'undefined') ? Auth.getCurrentUser() : null;
+
+      // ── Adapt Hero Section Based on Auth State ──
+      const heroCta = document.querySelector('.hero-cta');
+      if (heroCta) {
+        if (currentUser) {
+          heroCta.innerHTML = `
+            <a href="tours.html" class="btn btn-primary" id="hero-explore-btn" style="font-size:1.02rem;padding:14px 28px">🎥 Start 360° Tour</a>
+            <a href="calendar.html" class="btn btn-outline-white" id="hero-calendar-btn" style="font-size:1.02rem;padding:14px 28px">📅 Festival Calendar</a>
+            <a href="profile.html" class="btn btn-secondary" style="font-size:1.02rem;padding:14px 24px;background:rgba(255,255,255,0.15);color:white;border-color:rgba(255,255,255,0.3)">👤 My Dashboard</a>
+          `;
+          const heroEyebrow = document.querySelector('.hero-eyebrow');
+          if (heroEyebrow) {
+            heroEyebrow.innerHTML = `<span>✨</span> Welcome, ${currentUser.name}! · Full Project Access Unlocked`;
+          }
+        } else {
+          heroCta.innerHTML = `
+            <a href="tours.html" class="btn btn-primary" id="hero-explore-btn" style="font-size:1.02rem;padding:14px 28px">🎥 Start 360° Tour</a>
+            <a href="calendar.html" class="btn btn-outline-white" id="hero-calendar-btn" style="font-size:1.02rem;padding:14px 28px">📅 Festival Calendar</a>
+          `;
+        }
+      }
+
+      // ── Render Monastery Cards ──
+      const grid = document.getElementById('monasteriesGrid');
+      if (grid && window.M360Data) {
+        const getTourLink = (id) => `tours.html?id=${id}`;
+
+        grid.innerHTML = M360Data.monasteries.map((m, i) => `
+      <div class="card monastery-card" data-reveal data-reveal-delay="${i + 1}">
+        <div class="card-img-wrap">
+          <img class="card-img" src="${m.img}" alt="${m.name}" onerror="this.src='images/rumtek.png'" />
+          <div class="card-location">📍 ${m.location}</div>
+          <button class="favorite-btn ${M360Favorites.has(m.id) ? 'active' : ''}" onclick="toggleFav(this,'${m.id}')" title="Save to favourites">
+            ${M360Favorites.has(m.id) ? '❤️' : '🤍'}
+          </button>
+        </div>
+        <div class="card-body">
+          <div class="card-badges">
+            ${m.tags.slice(0, 2).map(t => `<span class="badge badge-saffron">${t}</span>`).join('')}
+          </div>
+          <h3 class="card-title">${m.name}</h3>
+          <p class="card-text">${m.description.substring(0, 120)}…</p>
+          <div style="display:flex;align-items:center;gap:12px;margin:12px 0">
+            <span class="stars">${'★'.repeat(Math.floor(m.rating))}${'☆'.repeat(5 - Math.floor(m.rating))}</span>
+            <span style="font-size:0.85rem;color:var(--text-muted)">${m.rating} (${m.reviews.toLocaleString()} reviews)</span>
+          </div>
+          <div class="card-actions">
+            <a href="${getTourLink(m.id)}" class="btn btn-primary" style="font-size:0.85rem;padding:9px 18px">🎥 Explore 360°</a>
+            <a href="${getTourLink(m.id)}" class="btn btn-secondary" style="font-size:0.85rem;padding:9px 18px">View Details</a>
+          </div>
+        </div>
+      </div>
+    `).join('');
+      }
+
+      // Update "Explore All Monasteries →" button
+      const viewAllMonasteriesBtn = document.getElementById('view-all-monasteries-btn');
+      if (viewAllMonasteriesBtn) {
+        viewAllMonasteriesBtn.href = 'tours.html';
+      }
+
+      // ── Render Festival Teaser ──
+      const fp = document.getElementById('festivalPreview');
+      if (fp && window.M360Data) {
+        fp.innerHTML = M360Data.events.slice(0, 4).map((ev, i) => `
+      <div class="festival-card" data-reveal data-reveal-delay="${i + 1}" onclick="window.location.href='calendar.html'">
+        <div class="festival-icon">${ev.emoji}</div>
+        <div class="festival-date">📅 ${getMonthName(ev.month)} ${ev.day}, 2026</div>
+        <h3>${ev.name}</h3>
+        <p>${ev.description.substring(0, 100)}…</p>
+        <div class="badge badge-saffron" style="margin-top:12px">📍 ${ev.monasteryName}</div>
+      </div>
+    `).join('');
+      }
+
+      // Update "View Full Festival Calendar" button
+      const viewFullCalendarBtn = document.getElementById('view-full-calendar-btn');
+      if (viewFullCalendarBtn) {
+        viewFullCalendarBtn.href = 'calendar.html';
+      }
+
+      // ── Update Transport Teaser Links ──
+      const transportTarget = 'stay.html#transport';
+      ['transport-flights-card', 'transport-trains-card', 'transport-buses-card'].forEach(cardId => {
+        const card = document.getElementById(cardId);
+        if (card) {
+          card.onclick = () => { window.location.href = transportTarget; };
+        }
+      });
+      const viewAllTransportBtn = document.getElementById('view-all-transport-btn');
+      if (viewAllTransportBtn) {
+        viewAllTransportBtn.href = transportTarget;
+      }
+
+      // Initialize Map
+      initMap();
+
+      // Re-trigger scroll reveal for dynamically added elements
+      setTimeout(() => {
+        document.querySelectorAll('[data-reveal]').forEach(el => {
+          if (!el.classList.contains('revealed') && window.IntersectionObserver) {
+            const observer = new window.IntersectionObserver(entries => {
+              entries.forEach(e => { 
+                if (e.isIntersecting) { 
+                  e.target.classList.add('revealed'); 
+                  observer.unobserve(e.target); 
+                } 
+              });
+            }, { threshold: 0.1 });
+            observer.observe(el);
+          }
+        });
+      }, 100);
+    });
+
+    function getMonthName(m) {
+      return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m - 1];
+    }
+
+    function toggleFav(btn, id) {
+      const isNow = M360Favorites.toggle(id);
+      btn.textContent = isNow ? '❤️' : '🤍';
+      btn.classList.toggle('active', isNow);
+    }
+
+    function initMap() {
+      const map = L.map('map', {
+        center: [27.35, 88.45],
+        zoom: 9,
+        zoomControl: false,
+      });
+
+      L.control.zoom({ position: 'topright' }).addTo(map);
+
+      // Clean, single base map (OpenStreetMap)
+      L.tileLayer('https://tile.openstreetmap.de/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 18,
+      }).addTo(map);
+
+      // Recalculate container size
+      setTimeout(() => map.invalidateSize(), 300);
+      window.addEventListener('resize', () => map.invalidateSize());
+
+      // Simple monastery marker
+      function monasteryIcon() {
+        return L.divIcon({
+          html: `<div style="
+        width:34px;height:34px;border-radius:50%;
+        background:#FF9933;border:2.5px solid white;
+        box-shadow:0 3px 8px rgba(0,0,0,0.25);
+        display:flex;align-items:center;justify-content:center;
+        font-size:16px;
+      ">🏯</div>`,
+          className: '',
+          iconSize: [34, 34],
+          iconAnchor: [17, 17],
+          popupAnchor: [0, -18],
+        });
+      }
+
+      // Simple hotel marker
+      function hotelIcon() {
+        return L.divIcon({
+          html: `<div style="
+        width:30px;height:30px;border-radius:50%;
+        background:white;border:2.5px solid #4A90E2;
+        box-shadow:0 3px 8px rgba(0,0,0,0.2);
+        display:flex;align-items:center;justify-content:center;
+        font-size:14px;
+      ">🏨</div>`,
+          className: '',
+          iconSize: [30, 30],
+          iconAnchor: [15, 15],
+          popupAnchor: [0, -16],
+        });
+      }
+
+      // Add monastery markers
+      if (window.M360Data) {
+        M360Data.monasteries.forEach(m => {
+          const marker = L.marker([m.lat, m.lng], { icon: monasteryIcon() }).addTo(map);
+          const tourLink = `tours.html?id=${m.id}`;
+
+          marker.bindPopup(`
+        <div class="map-popup">
+          <img class="map-popup-img" src="${m.img}" alt="${m.name}" onerror="this.src='images/rumtek.png'" />
+          <div class="map-popup-body">
+            <span class="badge badge-saffron" style="font-size:0.72rem">${m.sect} · ${m.location}</span>
+            <h3>${m.name}</h3>
+            <p>${m.description.substring(0, 90)}…</p>
+            <div class="map-popup-actions">
+              <a href="${tourLink}" class="popup-btn-primary">View Details</a>
+              <a href="${tourLink}" class="popup-btn-secondary">360° Tour</a>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${m.lat},${m.lng}" target="_blank" rel="noopener noreferrer" class="popup-btn-navigate" title="Get Directions">🧭 Directions</a>
+            </div>
+          </div>
+        </div>
+      `, { maxWidth: 280 });
+        });
+
+        M360Data.hotels.forEach(h => {
+          const marker = L.marker([h.lat, h.lng], { icon: hotelIcon() }).addTo(map);
+          const stayLink = 'stay.html';
+
+          marker.bindPopup(`
+        <div class="map-popup">
+          <div class="map-popup-body">
+            <span class="badge badge-gold" style="font-size:0.72rem">${h.category} · ${h.location}</span>
+            <h3>${h.name}</h3>
+            <p>₹${h.priceMin.toLocaleString()} – ₹${h.priceMax.toLocaleString()} / night</p>
+            <div class="stars">${'★'.repeat(Math.floor(h.rating))}</div>
+            <div class="map-popup-actions" style="margin-top:10px">
+              <a href="${stayLink}" class="popup-btn-primary">Book Now</a>
+              <a href="https://www.google.com/maps/dir/?api=1&destination=${h.lat},${h.lng}" target="_blank" rel="noopener noreferrer" class="popup-btn-navigate" title="Get Directions">🧭 Directions</a>
+            </div>
+          </div>
+        </div>
+      `, { maxWidth: 260 });
+        });
+      }
+    }
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+      });
+    }
+  </script>
+</body>
+
+</html>

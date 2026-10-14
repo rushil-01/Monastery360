@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Culture Gallery – Monastery360</title>
+  <meta name="description" content="Explore the virtual culture gallery of Sikkim's monasteries — murals, thangkas, scriptures, architecture and sacred art." />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#FF9933" />
+  <link rel="apple-touch-icon" href="images/icon-192.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/globals.css" />
+  <link rel="stylesheet" href="css/shared.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+  <script src="js/auth.js"></script>
+  <style>
+    .gallery-section { background: var(--cream); }
+    .gallery-stats {
+      display: flex; gap: 24px; flex-wrap: wrap;
+      margin-bottom: 32px;
+    }
+    .gallery-stat {
+      padding: 12px 24px;
+      background: var(--white);
+      border-radius: var(--radius-full);
+      border: 1px solid var(--cream-dark);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+    .gallery-stat span { color: var(--saffron); font-family: var(--font-heading); font-size: 1.1rem; }
+
+    /* Masonry extra */
+    .gallery-grid {
+      columns: 3 280px;
+      column-gap: 20px;
+    }
+    @media (max-width: 600px) { .gallery-grid { columns: 2 140px; } }
+    @media (max-width: 400px) { .gallery-grid { columns: 1; } }
+
+    /* Gallery item size variety */
+    .gallery-item:nth-child(2n) img   { height: 260px; }
+    .gallery-item:nth-child(3n) img   { height: 320px; }
+    .gallery-item img { width: 100%; object-fit: cover; display: block; border-radius: var(--radius-md); }
+    .gallery-item { margin-bottom: 20px; position: relative; overflow: hidden; border-radius: var(--radius-md); cursor: pointer; transition: transform 0.3s ease; }
+    .gallery-item:hover { transform: translateY(-4px); }
+    .gallery-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 20px; background: linear-gradient(to top, rgba(0,0,0,0.8), transparent); color: white; opacity: 0; transition: opacity 0.3s ease; }
+    .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+    /* Accordion styles */
+    .monastery-accordion { margin-bottom: 24px; background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; border: 1px solid var(--cream-dark); }
+    .accordion-header { display: flex; align-items: center; padding: 20px 24px; cursor: pointer; transition: background 0.3s; user-select: none; }
+    .accordion-header:hover { background: var(--cream); }
+    .accordion-thumb { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; margin-right: 20px; border: 2px solid var(--saffron); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+    .accordion-title { flex-grow: 1; font-family: var(--font-heading); font-size: 1.6rem; color: var(--deep); margin: 0; font-weight: 700; }
+    .accordion-icon { font-size: 1.5rem; color: var(--text-muted); transition: transform 0.3s; }
+    .monastery-accordion.open .accordion-icon { transform: rotate(180deg); color: var(--saffron); }
+    .accordion-content { display: none; padding: 10px 24px 32px; border-top: 1px solid var(--cream-dark); animation: fadeIn 0.4s ease; }
+    .monastery-accordion.open .accordion-content { display: block; }
+    
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; margin-top: 16px; }
+    .info-card { background: var(--cream); padding: 16px; border-radius: var(--radius-md); border: 1px solid rgba(0,0,0,0.05); }
+    .info-label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 6px; display: block; }
+    .info-value { font-size: 1rem; color: var(--deep); font-weight: 600; margin: 0; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+  <link rel="stylesheet" href="css/home.css" />
+  <script src="js/auth.js"></script>
+  <link rel="stylesheet" href="css/shared.css" />
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar scrolled" id="navbar">
+  <div class="container navbar-inner">
+    <a href="index.html" class="nav-logo">
+      <div class="logo-icon">☸️</div>
+      Monastery<span style="color:var(--saffron)">360</span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">🏠 Home</a></li>
+      <li><a href="calendar.html">📅 Festive Calendar</a></li>
+      <li><a href="tours.html">🎥 360° Tours</a></li>
+      <li><a href="gallery.html" class="active">🖼️ Culture Gallery</a></li>
+      <li><a href="stay.html">🏨 Stay & Booking</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-search-btn" id="searchBtn" title="Search">🔍</button>
+      <button class="nav-hamburger" id="navHamburger">☰</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ── Page Header ── -->
+<div class="page-header">
+  <div class="header-glow"></div>
+  <div class="container">
+    <h1>🖼️ Sacred Archives & Gallery</h1>
+    <p>Discover the true heritage, scriptures, and murals of Sikkim's distinct monasteries</p>
+  </div>
+</div>
+
+<!-- ── Gallery Sections ── -->
+<section class="section gallery-section" style="padding-top: 60px;">
+  <div class="container" id="monasterySections">
+    <!-- Rendered via JS -->
+  </div>
+</section>
+
+<!-- ── Cultural Story Banner ── -->
+<section class="section" style="background:linear-gradient(135deg,var(--deep) 0%,var(--earth-dark) 100%);color:var(--white)">
+  <div class="container text-center">
+    <div data-reveal>
+      <span class="eyebrow" style="color:var(--saffron-light)">📖 Cultural Heritage</span>
+      <h2 style="font-family:var(--font-heading);font-size:2.5rem;color:var(--white);margin:16px 0">Buddhism Arrived in<br/>Sikkim in the 7th Century</h2>
+      <p style="color:rgba(255,255,255,0.75);max-width:640px;margin:0 auto 32px;line-height:1.8">
+        Guru Padmasambhava — known as Guru Rinpoche — is believed to have visited Sikkim, consecrating the land as a "Hidden Land" (Beyul). The monasteries built across the four valleys are repositories of Himalayan Buddhist art, manuscripts, and oral traditions spanning over 1,400 years.
+      </p>
+      <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap">
+        <a href="tours.html" class="btn btn-gold">🎥 Virtual Tours</a>
+        <a href="calendar.html" class="btn btn-outline-white">📅 Festivals</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Lightbox ── -->
+<div class="lightbox" id="lightbox">
+  <button class="lightbox-close" id="lightboxClose">✕</button>
+  <div class="lightbox-content">
+    <button class="lightbox-nav lightbox-prev" id="lightboxPrev">◀</button>
+    <img class="lightbox-img" id="lightboxImg" src="" alt="" />
+    <div class="lightbox-info">
+      <h3 id="lightboxTitle"></h3>
+      <p id="lightboxDesc"></p>
+    </div>
+    <button class="lightbox-nav lightbox-next" id="lightboxNext">▶</button>
+  </div>
+</div>
+
+<!-- ── Search Modal ── -->
+<div class="modal-overlay" id="searchModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 style="font-family:var(--font-heading)">Search Monastery360</h3>
+      <button class="modal-close" id="searchClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="search-input-wrap">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search monasteries, events, hotels…" />
+      </div>
+      <div id="searchResults"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Footer ── -->
+<footer style="background:var(--deep);color:rgba(255,255,255,0.6);padding:32px 0;text-align:center;font-size:0.85rem">
+  <div class="container">
+    <a href="index.html" style="color:var(--saffron);font-family:var(--font-heading);font-size:1.1rem;font-weight:700">☸️ Monastery360</a>
+    <p style="margin-top:8px">© 2026 Monastery360 · Sacred Sikkim Heritage</p>
+  </div>
+</footer>
+
+<script src="js/pano_b64.js"></script>
+<script src="js/data.js"></script>
+<script src="js/app.js"></script>
+<script>
+(function() {
+
+let lightboxIdx   = 0;
+let allFilteredItems = [];
+
+const extraItems = [
+  { id: 'g10', title: 'Golden Prayer Hall', monastery: 'Rumtek', category: 'architecture', img: 'images/dodrul.png', desc: 'The opulent main prayer hall at Rumtek, with golden pillars and silk drapes.' },
+  { id: 'g11', title: 'Pemayangtse Ridge View', monastery: 'Pemayangtse', category: 'art', img: 'images/pemayangtse.png', desc: 'The monastery ridge at sunset — a favorite scene painted by local artists.' },
+  { id: 'g12', title: 'Ancient Scroll Chamber', monastery: 'Pemayangtse', category: 'history', img: 'images/mural1.png', desc: 'Centuries-old Buddhist scriptures preserved in lacquered wooden cases.' },
+  { id: 'g13', title: 'Sacred Chorten Complex', monastery: 'Gangtok', category: 'architecture', img: 'images/dodrul.png', desc: 'The Do-Drul Chorten complex is a masterpiece of Nyingma Buddhist architecture.' },
+  { id: 'g14', title: 'Festival Mask Collection', monastery: 'Rumtek', category: 'art', img: 'images/rumtek.png', desc: 'Hand-crafted papier-maché masks used in the annual Cham dance ceremonies.' },
+  { id: 'g15', title: 'Hilltop Stupa Trail', monastery: 'Tashiding', category: 'architecture', img: 'images/tashiding.png', desc: 'Over 100 stupas line the path to Tashiding, each containing sacred relics.' },
+];
+
+function getAllItems() {
+  return [...(window.M360Data?.gallery || []), ...extraItems];
+}
+
+const sectionsData = [
+  {
+    title: 'Rumtek Monastery',
+    match: 'Rumtek',
+    thumb: 'images/rumtek.png',
+    specifics: '<strong>📜 Scriptures & 🎨 Murals:</strong> Rumtek is renowned for its magnificent Thangka paintings and exquisite hand-painted murals depicting the Kagyu lineage. Its library holds pristine, ancient texts of the Kangyur and Tengyur, brought securely from Tibet by the 16th Karmapa.',
+    realData: window.M360Data?.monasteries.find(m => m.id === 'rumtek') || {}
+  },
+  {
+    title: 'Pemayangtse Monastery',
+    match: 'Pemayangtse',
+    thumb: 'images/pemayangtse.png',
+    specifics: '<strong>📜 Scriptures & 🎨 Murals:</strong> The crowning glory is the Zangdog Palri—a stunning 7-tiered 3D wooden masterpiece of Guru Rinpoche\'s heavenly palace. Its upper floors are adorned with vibrant, authentic ancient murals, while its library preserves irreplaceable original Nyingma scriptures.',
+    realData: window.M360Data?.monasteries.find(m => m.id === 'pemayangtse') || {}
+  },
+  {
+    title: 'Tashiding Monastery',
+    match: 'Tashiding',
+    thumb: 'images/tashiding.png',
+    specifics: '<strong>📜 Scriptures & 🎨 Murals:</strong> Famous for the sacred stone slabs carved with complete mantras (Mani Lhakor) by master craftsman Yanchong Lodil. Inside, the monastery preserves extremely rare texts written in gold ink and brilliant wall paintings illustrating the lives of great Buddhist masters.',
+    realData: window.M360Data?.monasteries.find(m => m.id === 'tashiding') || {}
+  },
+  {
+    title: 'Monasteries of Gangtok (Do-Drul & Enchey)',
+    match: 'Gangtok',
+    thumb: 'images/dodrul.png',
+    specifics: '<strong>📜 Scriptures & 🎨 Murals:</strong> Enchey features intricate exquisite murals of the Mahayana Pantheon and houses significant prayer texts. The Do-Drul Chorten contains a complete set of the Dorjee Phurba, Kangyur texts, and mandalas hidden securely within the stupa, strictly following traditional Tibetan relic sealing practices.',
+    realData: window.M360Data?.monasteries.find(m => m.id === 'dodrul') || {} // Combine Do-drul for meta stats
+  }
+];
+
+function getSections() {
+  const customSpecifics = {
+    'rumtek': '<strong>📜 Scriptures & 🎨 Murals:</strong> Rumtek is renowned for its magnificent Thangka paintings and exquisite hand-painted murals depicting the Kagyu lineage. Its library holds pristine, ancient texts of the Kangyur and Tengyur, brought securely from Tibet by the 16th Karmapa.',
+    'pemayangtse': '<strong>📜 Scriptures & 🎨 Murals:</strong> The crowning glory is the Zangdog Palri—a stunning 7-tiered 3D wooden masterpiece of Guru Rinpoche\'s heavenly palace. Its upper floors are adorned with vibrant, authentic ancient murals, while its library preserves irreplaceable original Nyingma scriptures.',
+    'tashiding': '<strong>📜 Scriptures & 🎨 Murals:</strong> Famous for the sacred stone slabs carved with complete mantras (Mani Lhakor) by master craftsman Yanchong Lodil. Inside, the monastery preserves extremely rare texts written in gold ink and brilliant wall paintings illustrating the lives of great Buddhist masters.',
+    'dodrul': '<strong>📜 Scriptures & 🎨 Murals:</strong> Enchey features intricate exquisite murals of the Mahayana Pantheon and houses significant prayer texts. The Do-Drul Chorten contains a complete set of the Dorjee Phurba, Kangyur texts, and mandalas hidden securely within the stupa, strictly following traditional Tibetan relic sealing practices.'
+  };
+
+  const mons = window.M360Data?.monasteries || [];
+  if (mons.length === 0) return sectionsData;
+
+  // Dynamically build sections for all monasteries in M360Data
+  return mons.map(m => {
+    const specifics = customSpecifics[m.id] || 
+      `<strong>📜 Heritage & Art:</strong> Preserving ancient Buddhist relics, holy scriptures, hand-painted murals, and sacred ritual artifacts of the ${m.sect || 'Himalayan'} tradition in ${m.location || 'Sikkim'}.`;
+    return {
+      title: m.name,
+      match: m.name.split(' ')[0], // matches 'Rumtek', 'Pemayangtse', etc.
+      id: m.id,
+      thumb: m.img || 'images/rumtek.png',
+      specifics: specifics,
+      realData: m
+    };
+  });
+}
+
+function toggleAccordion(idx) {
+  const el = document.getElementById('accordion-'+idx);
+  if(el) el.classList.toggle('open');
+}
+window.toggleAccordion = toggleAccordion;
+
+function renderGallerySections() {
+  const allItems = getAllItems();
+  const mainContainer = document.getElementById('monasterySections');
+  if (!mainContainer) return;
+
+  const dynamicSections = getSections();
+  let html = '';
+  allFilteredItems = [];
+
+  dynamicSections.forEach((section, index) => {
+    // Match items by monastery name or ID
+    const items = allItems.filter(item => {
+      const target = (item.monastery || '').toLowerCase();
+      const sMatch = (section.match || '').toLowerCase();
+      const sId = (section.id || '').toLowerCase();
+      const sTitle = (section.title || '').toLowerCase();
+      return target === sMatch || target === sId || sTitle.includes(target) || (sMatch && target.includes(sMatch));
+    });
+
+    // If section has no specific gallery items, add a fallback preview
+    const displayItems = items.length > 0 ? items : [
+      {
+        id: `auto-${section.id}`,
+        title: `${section.title} Sanctuary`,
+        monastery: section.title,
+        category: 'architecture',
+        img: section.thumb,
+        desc: `Sacred grounds and architecture of ${section.title}.`
+      }
+    ];
+
+    const startIndex = allFilteredItems.length;
+    displayItems.forEach(itm => allFilteredItems.push(itm));
+    const catEmoji = { art: '🎨', history: '📜', architecture: '🏛️' };
+
+    const data = section.realData || {};
+    
+    html += `
+      <div class="monastery-accordion" id="accordion-${index}" data-reveal>
+        <div class="accordion-header" onclick="toggleAccordion(${index})">
+          <img src="${section.thumb}" alt="${section.title}" class="accordion-thumb" onerror="this.src='images/rumtek.png'" />
+          <h2 class="accordion-title">${section.title}</h2>
+          <div class="accordion-icon">▼</div>
+        </div>
+        <div class="accordion-content">
+          
+          <div class="info-grid">
+            <div class="info-card"><span class="info-label">📍 Location</span><p class="info-value">${data.location || 'Sikkim'}</p></div>
+            <div class="info-card"><span class="info-label">🗓️ Founded</span><p class="info-value">${data.founded || 'Ancient'}</p></div>
+            <div class="info-card"><span class="info-label">📿 Sect</span><p class="info-value">${data.sect || 'Tibetan Buddhist'}</p></div>
+            <div class="info-card"><span class="info-label">✨ Highlights</span><p class="info-value">${data.highlights ? data.highlights.join(', ') : 'Sacred Artifacts'}</p></div>
+          </div>
+
+          <p style="color: var(--text-secondary); line-height: 1.7; margin-bottom: 20px; font-size: 1.05rem;">
+            ${data.description || 'A sacred destination preserving the authentic traditions and profound heritage of Buddhism in Sikkim.'}
+          </p>
+
+          <div style="background: rgba(212,175,55,0.08); padding: 20px 24px; border-left: 4px solid var(--saffron); border-radius: 4px; margin-bottom: 32px;">
+            <p style="color: var(--earth-dark); line-height: 1.6; font-size: 1rem; margin: 0;">
+              ${section.specifics}
+            </p>
+          </div>
+
+          <h4 style="font-family: var(--font-heading); color: var(--deep); margin-bottom: 16px; font-size: 1.3rem; margin-top: 10px;">📸 Curated Art Gallery (${displayItems.length} sacred exhibits)</h4>
+          <div class="gallery-grid">
+            ${displayItems.map((item, localIdx) => {
+              const globalIdx = startIndex + localIdx;
+              return `
+              <div class="gallery-item" onclick="openLightbox(${globalIdx})">
+                <img src="${item.img}" alt="${item.title}" onerror="this.src='images/rumtek.png'" />
+                <div class="gallery-overlay">
+                  <span class="gallery-tag" style="background: var(--saffron); color: var(--white); padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; font-weight: 500;">
+                    ${catEmoji[item.category]||'📍'} ${(item.category || 'heritage').charAt(0).toUpperCase()+(item.category || 'heritage').slice(1)}
+                  </span>
+                  <h4 style="margin-top: 8px; font-size: 1.1rem; text-shadow: 1px 1px 4px rgba(0,0,0,0.8); margin-bottom: 0;">${item.title}</h4>
+                </div>
+              </div>
+              `;
+            }).join('')}
+          </div>
+
+        </div>
+      </div>
+    `;
+  });
+
+  mainContainer.innerHTML = html;
+
+  // Re-trigger scroll reveal
+  setTimeout(() => {
+    document.querySelectorAll('[data-reveal]').forEach(el => {
+      if (!el.classList.contains('revealed')) {
+        const observer = new IntersectionObserver(entries => {
+          entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('revealed'); observer.unobserve(e.target); } });
+        }, { threshold: 0.1 });
+        observer.observe(el);
+      }
+    });
+  }, 100);
+}
+
+// ── Lightbox ──────────────────────────────────────────────────
+window.openLightbox = function(idx) {
+  lightboxIdx = idx;
+  updateLightbox();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow = 'hidden';
+};
+
+function updateLightbox() {
+  const item = allFilteredItems[lightboxIdx];
+  if (!item) return;
+  document.getElementById('lightboxImg').src   = item.img;
+  document.getElementById('lightboxImg').onerror = function() { this.src = 'images/rumtek.png'; };
+  document.getElementById('lightboxTitle').textContent = item.title;
+  document.getElementById('lightboxDesc').textContent  = `📍 ${item.monastery} · ${item.desc}`;
+  document.getElementById('lightboxPrev').style.opacity = lightboxIdx === 0 ? '0.3' : '1';
+  document.getElementById('lightboxNext').style.opacity = lightboxIdx === allFilteredItems.length-1 ? '0.3' : '1';
+}
+
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('lightboxClose').addEventListener('click', closeLightbox);
+document.getElementById('lightbox').addEventListener('click', e => { if (e.target === e.currentTarget) closeLightbox(); });
+document.getElementById('lightboxPrev').addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (lightboxIdx > 0) { lightboxIdx--; updateLightbox(); }
+});
+document.getElementById('lightboxNext').addEventListener('click', (e) => {
+  e.stopPropagation();
+  if (lightboxIdx < allFilteredItems.length-1) { lightboxIdx++; updateLightbox(); }
+});
+document.addEventListener('keydown', e => {
+  if (!document.getElementById('lightbox').classList.contains('open')) return;
+  if (e.key === 'ArrowLeft')  { if (lightboxIdx > 0) { lightboxIdx--; updateLightbox(); } }
+  if (e.key === 'ArrowRight') { if (lightboxIdx < allFilteredItems.length-1) { lightboxIdx++; updateLightbox(); } }
+  if (e.key === 'Escape') closeLightbox();
+});
+
+// ── Init ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', renderGallerySections);
+
+})();
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed:', err));
+    });
+  }
+</script>
+</body>
+</html>

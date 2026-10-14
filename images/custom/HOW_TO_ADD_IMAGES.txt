@@ -1,0 +1,55 @@
+=============================================================================
+Monastery360 — Custom Image Directory
+=============================================================================
+
+This directory is designated for your own custom photos and 360° panoramas.
+
+HOW IT WORKS:
+Any image placed in this folder will AUTOMATICALLY override the default image
+on the website with zero configuration needed.
+
+SUPPORTED IMAGE FORMATS:
+- JPEG (.jpg, .jpeg)
+- PNG (.png)
+- WebP (.webp)
+
+IMAGE NAMES YOU CAN OVERRIDE:
+-----------------------------------------------------------------------------
+Monastery Cards:
+  - rumtek.jpg          (Rumtek Monastery card)
+  - pemayangtse.jpg     (Pemayangtse Monastery card)
+  - tashiding.jpg       (Tashiding Monastery card)
+  - dodrul.jpg          (Do-Drul Chorten card)
+  - enchey.jpg          (Enchey Monastery card)
+  - ralang.png          (Ralang Monastery card)
+  - dubdi.png           (Dubdi Monastery card)
+  - phensang.png        (Phensang Monastery card)
+
+360° Equirectangular Panoramas (for tours.html):
+  - rumtek_pano.png
+  - pemayangtse_pano.png
+  - tashiding_pano.webp
+  - dodrul_pano.png
+  - enchey_pano.jpg
+  - ralang_pano.jpg
+  - dubdi_pano.jpeg
+  - phensang_pano.jpg
+
+Hotels:
+  - mayfair.png
+  - elgin_nor_khill.png
+  - orange_village.png
+  - denzong_regency.png
+  - elgin_mount_pandim.png
+  - norbu_ghang.png
+  - hotel_tashiding.jpg
+  - yangsum_farm.jpg
+
+Banners & General:
+  - hero.png            (Homepage hero banner)
+  - mural1.png          (Sacred mural / gallery)
+
+TIPS:
+- For best performance on GitHub, keep custom images under 1 MB each.
+- For 360° panoramas, equirectangular 2:1 aspect ratio (e.g. 2048x1024) works best.
+=============================================================================
