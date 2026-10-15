@@ -29,6 +29,11 @@ desktop.ini
 *.swo
 *~
 
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
 # Temporary and log files
 *.log
 *.tmp
